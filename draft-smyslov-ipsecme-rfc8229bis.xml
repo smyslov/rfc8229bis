@@ -230,18 +230,12 @@
         of a message to differentiate IKE and ESP messages.  TCP
         encapsulation also adds a 16-bit Length field that precedes every message
         to define the boundaries of messages within a stream.  
-        The message length plus the length of the field itself is sent this field.
-        If the first 32 bits of the message are zeros (a non-ESP marker), then the contents comprise an
+		The value in this field is equal to the length of the original message
+		plus the length of the field itself, in octets.  If the first 32 bits
+		of the message are zeros (a non-ESP marker), then the contents comprise an
         IKE message.  Otherwise, the contents comprise an ESP message.
         Authentication Header (AH) messages are not supported for TCP
         encapsulation.
-        </t>
-  
-        <t>Note, that since TCP header is longer than UDP header, and TCP
-        encapsulation also requires prepending of 16-bit Length field, some
-        very long ESP and IKE messages that could be sent over UDP cannot be
-        encapsulated in TCP, because their total length after encapsulation
-        would exceed 65535 and thus could not be represented in Length field.
         </t>
   
         <t>Although a TCP stream may be able to send very long messages,
@@ -250,7 +244,12 @@
         effective MTU for connections that are being encrypted using ESP, so
         the maximum message length will influence characteristics of inner
         connections, such as the TCP Maximum Segment Size (MSS).
-        </t>
+        Additionally, since TCP headers are longer than UDP headers, and TCP
+		encapsulation adds a 16-bit Length field, some
+		very long ESP and IKE messages that could be sent over UDP cannot be
+		encapsulated in TCP, because their total length after encapsulation
+		would exceed 65535 and thus could not be represented in Length field.
+		</t>
   
         <t>Note that this method of encapsulation will also work for placing IKE
         and ESP messages within any protocol that presents a stream
@@ -283,9 +282,9 @@
 
           <t><list style="symbols">
             <t>Length (2 octets, unsigned integer) - Length of the IKE packet,
-            including the Length field and non-ESP marker. Valuse 0 and 1 MUST NOT appear in this field.
-            The receiver MUST treat these values in the Length field as fatal error and MUST
-            close TCP session in this case.
+            including the Length field and non-ESP marker. The value in the Length
+			field MUST NOT be 0 or 1. The receiver MUST treat these values as
+			fatal errors and MUST close TCP connection.
             </t>
 
 	      </list>
@@ -316,9 +315,9 @@
 
           <t><list style="symbols">
             <t>Length (2 octets, unsigned integer) - Length of the ESP packet,
-            including the Length field. Valuse 0 and 1 MUST NOT appear in this field.
-            The receiver MUST treat these values in the Length field as fatal error and MUST
-            close TCP session in this case.</t>
+            including the Length field. The value in the Length
+			field MUST NOT be 0 or 1. The receiver MUST treat these values as
+			fatal errors and MUST close TCP connection.</t>
 
 	      </list>
           </t>
@@ -400,7 +399,7 @@
           network is likely to block UDP.
           </t>
 
-          <t>When switching from UDP to TCP a new IKE_SA_INIT exchange MUST be
+          <t>When switching from UDP to TCP, a new IKE_SA_INIT exchange MUST be
           initiated with new Initiator's SPI and with recalculated content of
           NAT_DETECTION_SOURCE_IP notification.
           </t>
@@ -512,81 +511,72 @@
         </section>
 
         <section title="Retransmissions" anchor="retr" >
-          <t>Section 2.1 of <xref target="RFC7296" /> describes how IKEv2 deals with unreliability
-          of UDP protocol.  In brief, the exchange Initiator is responsible for
+          <t>Section 2.1 of <xref target="RFC7296" /> describes how IKEv2 deals with the unreliability
+          of the UDP protocol.  In brief, the exchange Initiator is responsible for
           retransmissions and must retransmit requests message until response
           message is received.  If no reply is received after several
-          retransmissions, the SA is deleted.  The Responder never retransmits
-          but must resend the response message in case it receives
-          retransmitted request.
+          retransmissions, the SA is deleted.  The Responder never initiates retransmission,
+          but must send a response message again in case it receives a retransmitted request.
           </t>
 
-          <t>When IKEv2 uses reliable transport protocol the retransmission rules change as follows:
+          <t>When IKEv2 uses a reliable transport protocol, like TCP, the retransmission rules are as follows:
           <list style="symbols" >
             <t>the exchange Initiator SHOULD NOT retransmit request message; if
             no response is received within some reasonable period of time, the
-            IKE SA is deleted
+            IKE SA is deleted.
             </t>
-            <t>if TCP connection is broken and then restored while the exchange
-            Initiator is waiting for the response, it MUST
-            retransmit the request and continue to wait for the response
+            <t>if a TCP connection is broken and reestablished while the exchange
+            Initiator is waiting for a response, the Initiator MUST
+            retransmit its request and continue to wait for a response.
             </t>
-            <t>the exchange Responder acts as described in Section 2.1 of
-            <xref target="RFC7296" />, i.e. using TCP encapsulation doesn't change the
-            its behavior
+            <t>the exchange Responder does not change its behavior, but acts as
+			described in Section 2.1 of <xref target="RFC7296" />.
             </t>
           </list>
           </t>
         </section>
 
         <section title="Cookies and Puzzles" anchor="cookie-puzzle" >
-          <t>IKEv2 provides a DoS attack protection mechanism called Cookie, which
+          <t>IKEv2 provides a DoS attack protection mechanism through Cookies, which
           is described in Section 2.6 of <xref target="RFC7296" />.  <xref target="RFC8019" /> extends this
           mechanism for protection against DDoS attacks by means of Client
-          Puzzles.  Both mechanisms allow the Responder to keep no state until
-          the Initiator proves its IP address is real (and solves puzzle in the
-          latter case).
+          Puzzles.  Both mechanisms allow the Responder to avoid keeping state until
+          the Initiator proves its IP address is legitimate (and after solving a puzzle if required).
           </t>
 
           <t>The connection-oriented nature of TCP and transport brings additional 
           considerations for using these mechanisms.
-          In general, Cookie provides less value in case of TCP encapsulation,
-          because when the Responder receives the IKE_SA_INIT request the TCP
-          session has already been established, so the Initiator's IP address
-          has been verified.  Moreover, TCP Responder creates state as far as
-          the SYN packer is received (unless SYN Cookies described in <xref target="RFC4987" />
-          are employed), that violates the stateless nature of IKEv2 Cookies.
-          So, it makes little sense to send Cookie request in this situation,
-          unless the Responder in concerned with the possibility of TCP
-          Sequence Number attacks (see <xref target="RFC6528" /> for details).  On the other
-          hand, Puzzles still remain useful and their use requires using
-          Cookies.
+          In general, Cookies provide less value in case of TCP encapsulation,
+          since by the time a Responder receives the IKE_SA_INIT request, the TCP
+          session has already been established and the Initiator's IP address
+          has been verified.  Moreover, a TCP Responder creates state once
+          a SYN packet is received (unless SYN Cookies described in <xref target="RFC4987" />
+          are employed), which eliminates some of the benefits of IKEv2 Cookies.
+          When using TCP encapsulation, it adds little value to send Cookie requests without Puzzles
+          unless the Responder is concerned with the possibility of TCP
+          Sequence Number attacks (see <xref target="RFC6528" /> for details). Puzzles, on
+		  the other hand, still remain useful (and their use requires using Cookies).
           </t>
 
           <t>The following considerations are applicable for using Cookie and
           Puzzle mechanisms in case of TCP encapsulation:
           <list style="symbols" >
-            <t>the exchange Responder SHOULD NOT request Cookie unless it 
-            has good reason to do it (like a concern of the
-            possibility of TCP Sequence Number attacks or Puzzle request is
-            sent in the same message)
+            <t>the exchange Responder SHOULD NOT request a Cookie, with the
+			exception of Puzzles or for rare cases like preventing TCP Sequence
+			Number attacks.
             </t>
             <t>if the Responder chooses to send Cookie request (possibly along
             with Puzzle request), then the TCP connection that the IKE_SA_INIT
             request message was received over SHOULD be closed, so that the
             Responder remains stateless at least until the Cookie (or Puzzle
-            Solution) is returned
-            <list style="symbols" >
-              <t>note, that if this TCP connection is closed, then the Responder
-              MUST NOT include the Initiator's TCP port into the Cookie
-              calculation (*), since the Cookie will be returned over a new
-              TCP connection with a different port
-              </t>
-            </list>
+            Solution) is returned. Note that if this TCP connection is closed,
+			the Responder MUST NOT include the Initiator's TCP port into the Cookie
+			calculation (*), since the Cookie will be returned over a new
+			TCP connection with a different port.
             </t>
             <t>the exchange Initiator acts as described in Section 2.6 of
             <xref target="RFC7296" /> and Section 7 of <xref target="RFC8019" />, 
-            i.e. using TCP encapsulation doesn't change the Initiator's behavior
+            i.e. using TCP encapsulation doesn't change the Initiator's behavior.
             </t>
           </list>
 
@@ -599,20 +589,20 @@
           </t>
         </section>
 
-        <section title="Error Handling in the IKE_SA_INIT" anchor="errors" >
-          <t>Section 2.21.1 of <xref target="RFC7296" /> describes how error notifications should
-          be handled in the IKE_SA_INIT exchange.  In particular, it is advised
+        <section title="Error Handling in IKE_SA_INIT" anchor="errors" >
+          <t>Section 2.21.1 of <xref target="RFC7296" /> describes how error notifications
+		  are handled in the IKE_SA_INIT exchange.  In particular, it is advised
           that the Initiator should not act immediately after receiving error
           notification and should instead wait some time for valid response,
           since the IKE_SA_INIT messages are completely unauthenticated.  This
-          advice has little sense in case of TCP encapsulation.  If the
-          Initiator receives the response message over TCP, then either this
+          advice does not apply equally in case of TCP encapsulation.  If the
+          Initiator receives a response message over TCP, then either this
           message is genuine and was sent by the peer, or the TCP session was
-          hijacked and the message is forged, but in this case no genuine
+          hijacked and the message is forged. In this latter case, no genuine
           messages from the Responder will be received.
           </t>
 
-          <t>So, in case of TCP encapsulation the Initiator SHOULD NOT wait for
+          <t>Thus, in case of TCP encapsulation, an Initiator SHOULD NOT wait for
           additional messages in case it receives error notification from the
           Responder in the IKE_SA_INIT exchange.
           </t>
@@ -642,7 +632,7 @@
           </t>
         </section>
 
-        <section title="Considerations for Keep-Alives and Dead Peer Detection" anchor="sect-10">
+        <section title="Keep-Alives and Dead Peer Detection" anchor="sect-10">
           <t>Encapsulating IKE and IPsec inside of a TCP connection can impact the
           strategy that implementations use to detect peer liveness and to
           maintain middlebox port mappings.  Peer liveness should be checked
@@ -666,17 +656,17 @@
         </section>
 
         <section title="Implications of TCP Encapsulation on IPsec SA Processing" anchor="ipsec" >
-          <t>Using TCP encapsulation makes affects some aspects of IPsec SA processing.
+          <t>Using TCP encapsulation affects some aspects of IPsec SA processing.
           <list style="numbers" >
             <t>Section 8.1 of <xref target="RFC4301"/> requires all tunnel mode IPsec SAs to
             be able to copy the Don't Fragment (DF) bit from inner IP header to
-            the outer (tunnel) one.  With TCP encapsulation it's generally
-            impossible, because TCP/IP stack manages DF bit in the outer IP
+            the outer (tunnel) one.  With TCP encapsulation this is generally
+            not possible, because TCP/IP stack manages DF bit in the outer IP
             header, and usually the stack ensures that the DF bit is set for TCP
             packets to avoid IP fragmentation.
             </t>
 
-            <t>The other feature that is degraded with TCP encapsulation is an
+            <t>The other feature that is less relevant with TCP encapsulation is an
             ability to split traffic of different QoS classes into different
             IPsec SAs, created by a single IKE SA.  In this case the
             Differentiated Services Code Point (DSCP) field is usually copied
@@ -710,21 +700,21 @@
           first over UDP before attempting over TCP.  If there is a response to the
           request sent over UDP, then the ESP packets should be sent directly over IP or over UDP port 4500 
           (depending on if a NAT was detected), regardless of if a connection on a previous
-          network was using TCP encapsulation.  If no response is received within some period of time after
-          several retransmissions, then the Initiator changes transport for this very exchange from
-          UDP to TCP and continues retransmitting. New INFORMATIONAL exchange MUST
+          network was using TCP encapsulation.  If no response is received within a certain period of time after
+          several retransmissions, the Initiator SHOULD change its transport for this exchange from
+          UDP to TCP and continue retransmitting. New INFORMATIONAL exchange MUST
           NOT be started in this situation. If the Responder only responds to the request sent over TCP, then
           the ESP packets should be sent over the TCP connection, regardless of
           if a connection on a previous network did not use TCP encapsulation.
           </t>
 
-          <t>Since switching from UDP to TCP happens in the same INFORMATIONAL exchange
-          the content of the NAT_DETECTION_SOURCE_IP notification will in most cases be incorrect
-          (since UDP and TCP source ports will most probably be different), and
-          the peer will falsely think that there is a NAT in between.  This
-          should not cause problems because in this case all traffic will be
-          encapsulated in TCP anyway, and TCP encapsulation is the same with
-          regardless of NAT presence.
+          <t>Since switching from UDP to TCP happens can occur during a single
+		  INFORMATIONAL message exchange, the content of the NAT_DETECTION_SOURCE_IP
+		  notification will in most cases be incorrect (since UDP and TCP source ports
+		  will most likely be different), and the peer may incorrectly detect
+		  the presence of a NAT. This should not cause functional issues since all messages will be
+          encapsulated in TCP anyway, and TCP encapsulation does not change based on the
+		  presence of NATs.
           </t>
 
           <t>MOBIKE protocol defined the NO_NATS_ALLOWED notification that can be
@@ -745,12 +735,12 @@
         </section>
 
         <section title="IKE Redirect" anchor="redirect" >
-          <t>Redirect mechanism for IKEv2 is defined in <xref target="RFC5685"/>.  This mechanism
+          <t>A redirect mechanism for IKEv2 is defined in <xref target="RFC5685"/>.  This mechanism
           allows security gateways to redirect clients to another gateway
-          either during IKE SA establishment or after it is set up.  If a
-          client is connecting to a security gateway using TCP transport and
-          then is being redirected to another security gateway, then the client
-          must disregard the current transport.  In other words, the client
+          either during IKE SA establishment or after session setup.  If a
+          client is connecting to a security gateway using TCP and
+          then is redirected to another security gateway, the client
+          needs to reset its transport selection.  In other words, the client
           MUST again try first UDP and then fall back to TCP while establishing
           a new IKE SA, regardless of the transport of the SA the redirect
           notification was received over (unless the client's configuration
@@ -760,13 +750,13 @@
         </section>
 
         <section title="IKEv2 Session Resumption" anchor="resumption" >
-          <t>Session resumption for IKEv2 is defined in <xref target="RFC5723"/>.  Once IKE SA is
-          established the server creates a resumption ticket where information
+          <t>Session resumption for IKEv2 is defined in <xref target="RFC5723"/>.  Once an IKE SA is
+          established, the server creates a resumption ticket where information
           about this SA is stored, and transfers this ticket to the client.
-          The ticket may be later used to resume the IKE SA if it is deleted.
+          The ticket may be later used to resume the IKE SA after it is deleted.
           In the event of resumption the client presents the ticket in a new
-          exchange, called IKE_SESSION_RESUME.  For the new SA some parameters
-          are taken from the ticket and some are re-negotiated (more details
+          exchange, called IKE_SESSION_RESUME.  Some parameters in the new SA
+          are retrieved from the ticket and others are re-negotiated (more details
           are given in Section 5 of <xref target="RFC5723"/>).  If TCP encapsulation was used
           in an old SA, then the client SHOULD resume this SA using TCP,
           without first trying to connect over UDP.
@@ -774,37 +764,37 @@
         </section>
 
         <section title="IKEv2 Protocol Support for High Availability" anchor="ha" >
-          <t><xref target="RFC6311"/> defines a support for High Availability in IKEv2.  The core
-          idea is that in case of cluster failover a new active node
-          immediately initiates the special INFORMATION exchange containing the
+          <t><xref target="RFC6311"/> defines a support for High Availability in IKEv2.
+          In case of cluster failover, a new active node
+          can immediately initiate a special INFORMATION exchange containing the
           IKEV2_MESSAGE_ID_SYNC notification, which instructs the client to
           skip some number of Message IDs that might not be synchronized yet
           between nodes at the time of failover.
           </t>
 
-          <t>The problem is that TCP states are much harder to synchronize than
-          IKE states - it requires access to TCP/IP stack internals, which is
-          not always available for IKE/IPsec implementations.  If a cluster
+          <t>Synchronizing states when using TCP encapsulation is much harder than
+          when using UDP; doing so requires access to TCP/IP stack internals, which is
+          not always available from an IKE/IPsec implementation.  If a cluster
           implementation doesn't synchronize TCP states between nodes, then
           after failover event the new active node will not have any TCP
           connection with the client, so the node cannot initiate the
           INFORMATIONAL exchange as required by <xref target="RFC6311"/>.  Since the cluster
           usually acts as TCP Responder, the new active node cannot re-
           establish TCP connection, since only the TCP Originator can do it.
-          And for the client the situation of cluster failover may remain
-          unknown for long time if it has no IKE or ESP traffic to send.  Once
-          the client sends any ESP or IKEv2 packet, the cluster node will reply
+          For the client, the cluster failover event may remain
+          undetected for long time if it has no IKE or ESP traffic to send.  Once
+          the client sends an ESP or IKEv2 packet, the cluster node will reply
           with TCP RST and the client (as TCP Originator) will restore the TCP
           connection so that the node will be able to initiate the
           INFORMATIONAL exchange informing the client about the cluster
           failover.
           </t>
 
-          <t>This memo makes the following recommendation: if support for High
-          Availability in IKEv2 is negotiated and TCP transport is used and a
-          client is TCP Originator, then the client SHOULD periodically send
+          <t>This document makes the following recommendation: if support for High
+          Availability in IKEv2 is negotiated and TCP transport is used,
+		  a client that is a TCP Originator SHOULD periodically send
           IKEv2 messages (e.g. by initiating liveness check exchange) whenever
-          there is no any IKEv2 or ESP traffic.  This differs from the
+          there is no IKEv2 or ESP traffic.  This differs from the
           recommendations given in Section 2.4 of <xref target="RFC7296"/> in the following:
           the liveness check should be periodically performed even if the
           client has nothing to send over ESP.  The frequency of sending such
@@ -1004,7 +994,7 @@
         </t>
         
         <t><list style="hanging" hangIndent="-1">
-          <t hangText="This document updates the reference for TCP port 4500:">
+          <t hangText="This document updates the reference for TCP port 4500 from RFC 8229 to itself:">
             <vspace blankLines="0"/>
           </t>
           </list>
@@ -1378,7 +1368,7 @@
           thanks to Eric Kinnear for his implementation work.
           </t>
 
-          <t>Author would like to thank Tommy Pauly and Tero Kivinen for their
+          <t>Author would like to thank Tero Kivinen for his
           valuable comments while preparing this document.
           </t>
         </section>
