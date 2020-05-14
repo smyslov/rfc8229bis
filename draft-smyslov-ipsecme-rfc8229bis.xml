@@ -666,7 +666,7 @@
             packets to avoid IP fragmentation.
             </t>
 
-            <t>The other feature that is less relevant with TCP encapsulation is an
+            <t>The other feature that is less applicable with TCP encapsulation is an
             ability to split traffic of different QoS classes into different
             IPsec SAs, created by a single IKE SA.  In this case the
             Differentiated Services Code Point (DSCP) field is usually copied
@@ -701,7 +701,7 @@
           request sent over UDP, then the ESP packets should be sent directly over IP or over UDP port 4500 
           (depending on if a NAT was detected), regardless of if a connection on a previous
           network was using TCP encapsulation.  If no response is received within a certain period of time after
-          several retransmissions, the Initiator SHOULD change its transport for this exchange from
+          several retransmissions, the Initiator ought to change its transport for this exchange from
           UDP to TCP and continue retransmitting. New INFORMATIONAL exchange MUST
           NOT be started in this situation. If the Responder only responds to the request sent over TCP, then
           the ESP packets should be sent over the TCP connection, regardless of
@@ -766,7 +766,7 @@
         <section title="IKEv2 Protocol Support for High Availability" anchor="ha" >
           <t><xref target="RFC6311"/> defines a support for High Availability in IKEv2.
           In case of cluster failover, a new active node
-          can immediately initiate a special INFORMATION exchange containing the
+          must immediately initiate a special INFORMATION exchange containing the
           IKEV2_MESSAGE_ID_SYNC notification, which instructs the client to
           skip some number of Message IDs that might not be synchronized yet
           between nodes at the time of failover.
@@ -784,7 +784,7 @@
           For the client, the cluster failover event may remain
           undetected for long time if it has no IKE or ESP traffic to send.  Once
           the client sends an ESP or IKEv2 packet, the cluster node will reply
-          with TCP RST and the client (as TCP Originator) will restore the TCP
+          with TCP RST and the client (as TCP Originator) will reestablish the TCP
           connection so that the node will be able to initiate the
           INFORMATIONAL exchange informing the client about the cluster
           failover.
@@ -1368,7 +1368,7 @@
           thanks to Eric Kinnear for his implementation work.
           </t>
 
-          <t>Author would like to thank Tero Kivinen for his
+          <t>The authors would like to thank Tero Kivinen for his
           valuable comments while preparing this document.
           </t>
         </section>
