@@ -702,7 +702,7 @@
           (depending on if a NAT was detected), regardless of if a connection on a previous
           network was using TCP encapsulation.  If no response is received within a certain period of time after
           several retransmissions, the Initiator ought to change its transport for this exchange from
-          UDP to TCP and continue retransmitting. New INFORMATIONAL exchange MUST
+          UDP to TCP and resend the request message. New INFORMATIONAL exchange MUST
           NOT be started in this situation. If the Responder only responds to the request sent over TCP, then
           the ESP packets should be sent over the TCP connection, regardless of
           if a connection on a previous network did not use TCP encapsulation.
