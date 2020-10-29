@@ -1088,7 +1088,7 @@
           </t>
         </section>
 
-        <section title="Example Exchanges of TCP Encapsulation with TLS 1.2" anchor="tls">
+        <section title="Example Exchanges of TCP Encapsulation with TLS 1.3" anchor="tls">
           <section title="Establishing an IKE Session" anchor="sect-b.1">
             <figure anchor="figure-5"><artwork><![CDATA[
                 Client                              Server
@@ -1102,15 +1102,11 @@
   2)  ---------------------  TLS Session  ---------------------
       ClientHello               ---------->
                                                     ServerHello
-                                                   Certificate*
-                                             ServerKeyExchange*
-                                <----------     ServerHelloDone
-      ClientKeyExchange
-      CertificateVerify*
-      [ChangeCipherSpec]
-      Finished                  ---------->
-                                             [ChangeCipherSpec]
-                                <----------            Finished
+                                          {EncryptedExtensions}
+                                                 {Certificate*}
+                                           {CertificateVerify*}
+                                <----------          {Finished}
+      {Finished}                ---------->
 
   3)  ---------------------- Stream Prefix --------------------
       "IKETCP"                  ---------->
@@ -1223,11 +1219,10 @@
       TcpAck                    ---------->
   2)  ---------------------  TLS Session  ---------------------
       ClientHello               ---------->
-                                <----------         ServerHello
-                                             [ChangeCipherSpec]
-                                                       Finished
-      [ChangeCipherSpec]        ---------->
-      Finished
+                                                    ServerHello
+                                          {EncryptedExtensions}
+                                <----------          {Finished}
+      {Finished}                ---------->
   3)  ---------------------- Stream Prefix --------------------
       "IKETCP"                  ---------->
   4)  <---------------------> IKE/ESP Flow <------------------>
@@ -1242,11 +1237,8 @@
               and port.
               </t>
               
-              <t>In the ClientHello TLS message, the client SHOULD send the
-              session ID it received in the previous TLS handshake if
-              available.  It is up to the server to perform either an
-              abbreviated handshake or a full handshake based on the session ID
-              match.
+              <t>The client SHOULD attempt TLS session resumption if it
+              has previously established a session with the server.
               </t>
               
               <t>After TCP and TLS are complete, the client sends the stream
@@ -1296,17 +1288,13 @@
       TcpAck                   ----------->
 
   4)  ---------------------  TLS Session  ---------------------
-      ClientHello              ----------->
+      ClientHello               ---------->
                                                     ServerHello
-                                                   Certificate*
-                                             ServerKeyExchange*
-                               <-----------     ServerHelloDone
-      ClientKeyExchange
-      CertificateVerify*
-      [ChangeCipherSpec]
-      Finished                 ----------->
-                                             [ChangeCipherSpec]
-                               <-----------            Finished
+                                          {EncryptedExtensions}
+                                                 {Certificate*}
+                                           {CertificateVerify*}
+                                <----------          {Finished}
+      {Finished}                ---------->
 
   5)  ---------------------- Stream Prefix --------------------
       "IKETCP"                  ---------->
