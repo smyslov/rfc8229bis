@@ -544,12 +544,12 @@
           In general, Cookies provide less value in case of TCP encapsulation,
           since by the time a Responder receives the IKE_SA_INIT request, the TCP
           session has already been established and the Initiator's IP address
-          has been verified.  Moreover, a TCP/IP stack  creates a state once
+          has been verified.  Moreover, a TCP/IP stack creates state once
           a TCP SYN packet is received (unless SYN Cookies described in <xref target="RFC4987" />
-          are employed), which contadicts the statelessness of IKEv2 Cookies.
-          In particular, with TCP an attacker is able to mount a SYN flooding DoS attack 
-          which IKEv2 Responder cannot prevent using stateless IKEv2 Cookies.
-          So, when using TCP encapsulation it makes little sense to send Cookie requests without 
+          are employed), which contradicts the statelessness of IKEv2 Cookies.
+          In particular, with TCP, an attacker is able to mount a SYN flooding DoS attack 
+          which an IKEv2 Responder cannot prevent using stateless IKEv2 Cookies.
+          Thus, when using TCP encapsulation, it makes little sense to send Cookie requests without 
           Puzzles unless the Responder is concerned with a possibility of TCP
           Sequence Number attacks (see <xref target="RFC6528" /> for details). Puzzles, on
 		  the other hand, still remain useful (and their use requires using Cookies).
@@ -582,11 +582,11 @@
           and they don't include transport protocol ports.  However these examples are given
           for illustrative purposes, since Cookie generation algorithm is a
           local matter and some implementations might include port numbers,
-          that won't work with TCP encapsulation. Note also, that these 
-          examples include Initiator's IP address in Cookie calculation.
-          In general this address may cahnge between two initial requests (w/o and with Cookie).
-          This may happen due to NATs in between, since in case of TCP protocol NATs have more freedom 
-          in changing source IP address for new TCP connections. In this case cookie verification would fail.
+          that won't work with TCP encapsulation. Note also that these 
+          examples include the Initiator's IP address in Cookie calculation.
+          In general this address may change between two initial requests (with and without Cookies).
+          This may happen due to NATs, since NATs have more freedom to change change source IP addresses for new
+          TCP connections than for UDP. In such cases cookie verification might fail.
           </t>
 
         </section>
