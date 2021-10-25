@@ -57,7 +57,7 @@
 
         <t>TCP encapsulation for IKE and IPsec was defined in <xref target="RFC8229" />.
         This document updates specification for TCP encapsulation by including
-        additional calarifications obtained during implementation and deployment
+        additional clarifications obtained during implementation and deployment
         of this method. This documents makes RFC8229 obsolete.
         </t>
 	  </abstract>
