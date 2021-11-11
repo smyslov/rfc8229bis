@@ -1356,7 +1356,7 @@
         </section>
 
         <section title="Acknowledgments" numbered="no" anchor="acknowledgments">
-          <t>The following people authored RFC8229: Tommy Pauly, Samy Touati and Ravi Mantha.
+          <t>Thanks to the original authors of RFC8229, Tommy Pauly, Samy Touati, and Ravi Mantha.
           Since this document is an update for RFC 8229, most of its text was borrowed
           from this RFC.
           </t>
