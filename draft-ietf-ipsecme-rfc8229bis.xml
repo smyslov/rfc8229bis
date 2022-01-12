@@ -46,8 +46,8 @@
 
       <abstract>
         <t> This document describes a method to transport Internet Key Exchange
-        Protocol (IKE) and IPsec packets over a TCP connection for traversing
-        network middleboxes that may block IKE negotiation over UDP.  This
+        Protocol (IKE) and IPsec packets over a TCP connection in case routers or network middleboxes 
+        do not handle UDP, so that IKE negotiation over UDP would fail.  This
         method, referred to as "TCP encapsulation", involves sending both IKE
         packets for Security Association establishment and Encapsulating
         Security Payload (ESP) packets over a TCP connection.  This method is
@@ -56,7 +56,7 @@
         </t>
 
         <t>TCP encapsulation for IKE and IPsec was defined in <xref target="RFC8229" />.
-        This document updates specification for TCP encapsulation by including
+        This document updates the specification for TCP encapsulation by including
         additional clarifications obtained during implementation and deployment
         of this method. This documents makes RFC8229 obsolete.
         </t>
@@ -564,11 +564,11 @@
             </t>
             <t>if the Responder chooses to send Cookie request (possibly along
             with Puzzle request), then the TCP connection that the IKE_SA_INIT
-            request message was received over SHOULD be closed, so that the
-            Responder remains stateless at least until the Cookie (or Puzzle
-            Solution) is returned. Note that if this TCP connection is closed,
-			the Responder MUST NOT include the Initiator's TCP port into the Cookie
-			calculation (*), since the Cookie will be returned over a new
+            request message was received over SHOULD be closed after the Responder sends its reply
+            and no repeated requests are received within some short period of time (*)
+            to keep the Responder stateless. Note that the Responder MUST NOT 
+            include the Initiator's TCP port into the Cookie
+			calculation (**), since the Cookie may be returned over a new
 			TCP connection with a different port.
             </t>
             <t>the exchange Initiator acts as described in Section 2.6 of
@@ -576,8 +576,22 @@
             i.e. using TCP encapsulation doesn't change the Initiator's behavior.
             </t>
           </list>
+          </t>
 
-          (*) Examples of Cookie calculation methods are given in Section 2.6
+          <t>
+          (*) There is a trade-off in choosing the period of time after which
+          TCP connection is closed. If it is too short, then the proper Initiator
+          which repeats its request would need to re-establish the TCP connection
+          introducing additional delay. On the other hand, if it is too long, then 
+          the Responder's resources would be wasted in case the Initiator never comes back.
+          This document doesn't specify the duration of time, because it doesn't affect interoperability, 
+          but it is believed that 5-10 seconds is a good compromise. Note also, that if the Responder requests 
+          the Initiator to solve a puzzle, then the Responder may estimate how long it would take the Initiator 
+          to find a solution and adjust the time interval accordingly.
+          </t>
+
+          <t>
+          (**) Examples of Cookie calculation methods are given in Section 2.6
           of <xref target="RFC7296" /> and in Section 7.1.1.3 of <xref target="RFC8019" /> 
           and they don't include transport protocol ports.  However these examples are given
           for illustrative purposes, since Cookie generation algorithm is a
@@ -607,6 +621,14 @@
           <t>Thus, in case of TCP encapsulation, an Initiator SHOULD NOT wait for
           additional messages in case it receives error notification from the
           Responder in the IKE_SA_INIT exchange.
+          </t>
+
+          <t>If in the IKE_SA_INIT exchange the Responder returns an error notification that implies
+          a recovery action from the Initiator (such as INVALID_KE_PAYLOAD
+          or INVALID_MAJOR_VERSION, see Section 2.21.1 of <xref target="RFC7296" />) 
+          then the Responder SHOULD NOT close the TCP connection immediately, in anticipation
+          that the Initiator will repeat the request with corrected parameters.
+          See also <xref target="cookie-puzzle" />.
           </t>
         </section>
 
@@ -653,7 +675,8 @@
           <t>Note that, depending on the configuration of TCP and TLS on the
           connection, TCP keep-alives <xref target="RFC1122"/> and TLS keep-alives <xref target="RFC6520"/>
           may be used.  These MUST NOT be used as indications of IKE peer
-          liveness.
+          liveness, for which purpose the standard IKEv2 mechanism of exchanging empty INFORMATIONAL messages is used
+          (see Section 1.4 of <xref target="RFC7296" />).
           </t>
         </section>
 
@@ -692,13 +715,14 @@
 
       <section title="Interaction with IKEv2 Extensions" anchor="extensions" >
         <section title="MOBIKE Protocol" anchor="sect-8">
-          <t>MOBIKE protocol, that allows IKEv2 SA to migrate between IP
+          <t>The MOBIKE protocol, that allows SAs to migrate between IP
           addresses, is defined in <xref target="RFC4555"/>, and <xref target="RFC4621"/> further clarifies
           the details of the protocol. When an IKE session that has negotiated MOBIKE is
           transitioning between networks, the Initiator of the transition may
           switch between using TCP encapsulation, UDP encapsulation, or no
           encapsulation.  Implementations that implement both MOBIKE and TCP
-          encapsulation MUST support dynamically enabling and disabling TCP
+          encapsulation within the same connection configuration 
+          MUST support dynamically enabling and disabling TCP
           encapsulation as interfaces change.
           </t>
 
@@ -709,13 +733,13 @@
           (depending on if a NAT was detected), regardless of if a connection on a previous
           network was using TCP encapsulation.  If no response is received within a certain period of time after
           several retransmissions, the Initiator ought to change its transport for this exchange from
-          UDP to TCP and resend the request message. New INFORMATIONAL exchange MUST
+          UDP to TCP and resend the request message. A new INFORMATIONAL exchange MUST
           NOT be started in this situation. If the Responder only responds to the request sent over TCP, then
           the ESP packets should be sent over the TCP connection, regardless of
           if a connection on a previous network did not use TCP encapsulation.
           </t>
 
-          <t>Since switching from UDP to TCP happens can occur during a single
+          <t>Since switching from UDP to TCP can happen during a single
 		  INFORMATIONAL message exchange, the content of the NAT_DETECTION_SOURCE_IP
 		  notification will in most cases be incorrect (since UDP and TCP source ports
 		  will most likely be different), and the peer may incorrectly detect
@@ -724,7 +748,7 @@
 		  presence of NATs.
           </t>
 
-          <t>MOBIKE protocol defined the NO_NATS_ALLOWED notification that can be
+          <t>MOBIKE protocol defines the NO_NATS_ALLOWED notification that can be
           used to detect the presence of NAT between peer and to refuse to
           communicate in this situation.  In case of TCP the NO_NATS_ALLOWED
           notification SHOULD be ignored because TCP generally has no problems
@@ -764,9 +788,13 @@
           In the event of resumption the client presents the ticket in a new
           exchange, called IKE_SESSION_RESUME.  Some parameters in the new SA
           are retrieved from the ticket and others are re-negotiated (more details
-          are given in Section 5 of <xref target="RFC5723"/>).  If TCP encapsulation was used
-          in an old SA, then the client SHOULD resume this SA using TCP,
-          without first trying to connect over UDP.
+          are given in Section 5 of <xref target="RFC5723"/>).  
+          </t>
+
+          <t>Since network conditions may change while the client is incative,
+          the fact that TCP encapsulation was used in an old SA SHOULD NOT affect which transport
+          is used during session resumption. In other words, the transport should be 
+          selected as if the IKE SA is being created from scratch.
           </t>
         </section>
 
