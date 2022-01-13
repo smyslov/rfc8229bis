@@ -748,7 +748,7 @@
 		  presence of NATs.
           </t>
 
-          <t>MOBIKE protocol defines the NO_NATS_ALLOWED notification that can be
+          <t>The MOBIKE protocol defines the NO_NATS_ALLOWED notification that can be
           used to detect the presence of NAT between peer and to refuse to
           communicate in this situation.  In case of TCP the NO_NATS_ALLOWED
           notification SHOULD be ignored because TCP generally has no problems
