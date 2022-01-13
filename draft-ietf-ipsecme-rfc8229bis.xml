@@ -565,10 +565,10 @@
             <t>if the Responder chooses to send Cookie request (possibly along
             with Puzzle request), then the TCP connection that the IKE_SA_INIT
             request message was received over SHOULD be closed after the Responder sends its reply
-            and no repeated requests are received within some short period of time (*)
-            to keep the Responder stateless. Note that the Responder MUST NOT 
+            and no repeated requests are received within some short period of time 
+            to keep the Responder stateless (see <xref target="tradeoff" />). Note that the Responder MUST NOT 
             include the Initiator's TCP port into the Cookie
-			calculation (**), since the Cookie may be returned over a new
+			calculation (*), since the Cookie may be returned over a new
 			TCP connection with a different port.
             </t>
             <t>the exchange Initiator acts as described in Section 2.6 of
@@ -576,22 +576,8 @@
             i.e. using TCP encapsulation doesn't change the Initiator's behavior.
             </t>
           </list>
-          </t>
 
-          <t>
-          (*) There is a trade-off in choosing the period of time after which
-          TCP connection is closed. If it is too short, then the proper Initiator
-          which repeats its request would need to re-establish the TCP connection
-          introducing additional delay. On the other hand, if it is too long, then 
-          the Responder's resources would be wasted in case the Initiator never comes back.
-          This document doesn't specify the duration of time, because it doesn't affect interoperability, 
-          but it is believed that 5-10 seconds is a good compromise. Note also, that if the Responder requests 
-          the Initiator to solve a puzzle, then the Responder may estimate how long it would take the Initiator 
-          to find a solution and adjust the time interval accordingly.
-          </t>
-
-          <t>
-          (**) Examples of Cookie calculation methods are given in Section 2.6
+          (*) Examples of Cookie calculation methods are given in Section 2.6
           of <xref target="RFC7296" /> and in Section 7.1.1.3 of <xref target="RFC8019" /> 
           and they don't include transport protocol ports.  However these examples are given
           for illustrative purposes, since Cookie generation algorithm is a
@@ -603,6 +589,19 @@
           TCP connections than for UDP. In such cases cookie verification might fail.
           </t>
 
+          <section title="Statelessness versus Delay of SA Establishment" anchor="tradeoff" >
+            <t>
+            There is a trade-off in choosing the period of time after which
+            TCP connection is closed. If it is too short, then the proper Initiator
+            which repeats its request would need to re-establish the TCP connection
+            introducing additional delay. On the other hand, if it is too long, then 
+            the Responder's resources would be wasted in case the Initiator never comes back.
+            This document doesn't specify the duration of time, because it doesn't affect interoperability, 
+            but it is believed that 5-10 seconds is a good compromise. Note also, that if the Responder requests 
+            the Initiator to solve a puzzle, then the Responder may estimate how long it would take the Initiator 
+            to find a solution and adjust the time interval accordingly.
+            </t>
+          </section>
         </section>
 
         <section title="Error Handling in IKE_SA_INIT" anchor="errors" >
