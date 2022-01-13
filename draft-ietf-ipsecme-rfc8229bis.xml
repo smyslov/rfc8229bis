@@ -715,7 +715,7 @@
 
       <section title="Interaction with IKEv2 Extensions" anchor="extensions" >
         <section title="MOBIKE Protocol" anchor="sect-8">
-          <t>The MOBIKE protocol, that allows SAs to migrate between IP
+          <t>The MOBIKE protocol, which allows SAs to migrate between IP
           addresses, is defined in <xref target="RFC4555"/>, and <xref target="RFC4621"/> further clarifies
           the details of the protocol. When an IKE session that has negotiated MOBIKE is
           transitioning between networks, the Initiator of the transition may
