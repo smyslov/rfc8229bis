@@ -568,7 +568,7 @@
             and no repeated requests are received within some short period of time 
             to keep the Responder stateless (see <xref target="tradeoff" />). Note that the Responder MUST NOT 
             include the Initiator's TCP port into the Cookie
-			calculation (*), since the Cookie may be returned over a new
+			calculation (*), since the Cookie can be returned over a new
 			TCP connection with a different port.
             </t>
             <t>the exchange Initiator acts as described in Section 2.6 of
