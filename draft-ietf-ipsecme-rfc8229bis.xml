@@ -598,7 +598,7 @@
             the Responder's resources would be wasted in case the Initiator never comes back.
             This document doesn't specify the duration of time, because it doesn't affect interoperability, 
             but it is believed that 5-10 seconds is a good compromise. Note also, that if the Responder requests 
-            the Initiator to solve a puzzle, then the Responder may estimate how long it would take the Initiator 
+            the Initiator to solve a puzzle, then the Responder can estimate how long it would take the Initiator 
             to find a solution and adjust the time interval accordingly.
             </t>
           </section>
