@@ -2,7 +2,7 @@
 
 <!DOCTYPE rfc SYSTEM "rfc2629.dtd">
 
-<rfc category="std" ipr="trust200902" docName="draft-ietf-ipsecme-rfc8229bis-02" obsoletes="8229">
+<rfc category="std" ipr="trust200902" docName="draft-ietf-ipsecme-rfc8229bis-03" obsoletes="8229">
 
 <?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
 
@@ -55,10 +55,10 @@
         negotiated over UDP.
         </t>
 
-        <t>TCP encapsulation for IKE and IPsec was defined in <xref target="RFC8229" />.
+        <t>TCP encapsulation for IKE and IPsec was defined in RFC 8229.
         This document updates the specification for TCP encapsulation by including
         additional clarifications obtained during implementation and deployment
-        of this method. This documents makes RFC8229 obsolete.
+        of this method. This documents obsoletes RFC 8229.
         </t>
 	  </abstract>
     </front>
@@ -163,6 +163,11 @@
             </t>
               
           </list>
+
+          TCP encapsulation for IKE and IPsec was defined in <xref target="RFC8229" />.
+          This document updates the specification for TCP encapsulation by including
+          additional clarifications obtained during implementation and deployment
+          of this method.
           </t>
 
         </section>
@@ -516,15 +521,15 @@
 
           <t>When IKEv2 uses a reliable transport protocol, like TCP, the retransmission rules are as follows:
           <list style="symbols" >
-            <t>the exchange Initiator SHOULD NOT retransmit request message; if
+            <t>The exchange Initiator SHOULD NOT retransmit request message; if
             no response is received within some reasonable period of time, the
             IKE SA is deleted.
             </t>
-            <t>if a TCP connection is broken and reestablished while the exchange
+            <t>If a new TCP connection for the IKE SA is established while the exchange
             Initiator is waiting for a response, the Initiator MUST
-            retransmit its request and continue to wait for a response.
+            retransmit its request over this connection and continue to wait for a response.
             </t>
-            <t>the exchange Responder does not change its behavior, but acts as
+            <t>The exchange Responder does not change its behavior, but acts as
 			described in Section 2.1 of <xref target="RFC7296" />.
             </t>
           </list>
@@ -645,14 +650,13 @@
           <t>If a NAT is detected due to the SHA-1 digests not matching the
           expected values, no change should be made for encapsulation of
           subsequent IKE or ESP packets, since TCP encapsulation inherently
-          supports NAT traversal.  Implementations MAY use the information that
+          supports NAT traversal. However, for the transport mode IPsec SAs, implementations 
+          need to handle TCP and UDP packet checksum fixup during decapsulation, 
+          as defined for UDP encapsulation in <xref target="RFC3948"/>.
+          Implementations MAY use the information that
           a NAT is present to influence keep-alive timer values.
           </t>
 
-          <t>If a NAT is detected, implementations need to handle transport mode
-          TCP and UDP packet checksum fixup as defined for UDP encapsulation in
-          <xref target="RFC3948"/>.
-          </t>
         </section>
 
         <section title="Keep-Alives and Dead Peer Detection" anchor="sect-10">
@@ -699,8 +703,8 @@
             With TCP encapsulation all IPsec SAs created by a single IKE SA will
             share a single TCP connection and thus will receive the same level of
             service (see <xref target="perf.3" />).  If this functionality is needed, 
-            implementations should create several IKE SAs over TCP and assign a corresponding DSCP value
-            to each of them.
+            implementations should create several IKE SAs each over separate TCP connection 
+            and assign a corresponding DSCP value to each of them.
             </t>
           </list>
           </t>
@@ -738,13 +742,18 @@
           if a connection on a previous network did not use TCP encapsulation.
           </t>
 
+          <t>If the TCP transport was used for the previous network connection, the old TCP
+          connection SHOULD be closed by the Initiator once MOBIKE finishes migration 
+          to a new connection (either TCP or UDP).
+          </t>
+
           <t>Since switching from UDP to TCP can happen during a single
 		  INFORMATIONAL message exchange, the content of the NAT_DETECTION_SOURCE_IP
 		  notification will in most cases be incorrect (since UDP and TCP source ports
 		  will most likely be different), and the peer may incorrectly detect
-		  the presence of a NAT. This should not cause functional issues since all messages will be
-          encapsulated in TCP anyway, and TCP encapsulation does not change based on the
-		  presence of NATs.
+		  the presence of a NAT. Section 3.5 of <xref target="RFC4555" /> requires that 
+          a new INFORMATIONAL exchange with the UPDATE_SA_ADDRESSES notify be initiated 
+          in case the address (or transport) is changed while waiting for a response.
           </t>
 
           <t>The MOBIKE protocol defines the NO_NATS_ALLOWED notification that can be
@@ -1013,12 +1022,7 @@
         the TCP Responder must include decryption, authentication, and replay
         checks.
         </t>
-        
-        <t>Since TCP provides reliable, in-order delivery of ESP messages, the
-        ESP anti-replay window size SHOULD be set to 1.  See <xref target="RFC4303"/> for a
-        complete description of the ESP anti-replay window.  This increases
-        the protection of implementations against replay attacks.
-        </t>
+
       </section>
 
       <section title="IANA Considerations" anchor="sect-14">
@@ -1260,7 +1264,6 @@
   3)  ---------------------- Stream Prefix --------------------
       "IKETCP"                  ---------->
   4)  <---------------------> IKE/ESP Flow <------------------>
-      Length + ESP Frame        ---------->
         ]]></artwork>
         	</figure>
             <t><list style="numbers">
@@ -1333,9 +1336,9 @@
   5)  ---------------------- Stream Prefix --------------------
       "IKETCP"                  ---------->
 
-  6)  ----------------------- IKE Session ---------------------
+  6)  ------------ Retransmit Message from step 2 -------------
       Length + Non-ESP Marker  ----------->
-      INFORMATIONAL (Same as step 2)
+      INFORMATIONAL
       HDR, SK { N(UPDATE_SA_ADDRESSES),
       N(NAT_DETECTION_SOURCE_IP),
       N(NAT_DETECTION_DESTINATION_IP) }
@@ -1343,7 +1346,19 @@
                                <------- Length + Non-ESP Marker
                           HDR, SK { N(NAT_DETECTION_SOURCE_IP),
                               N(NAT_DETECTION_DESTINATION_IP) }
-  7)  <----------------- IKE/ESP Data Flow ------------------->
+
+  7)  ---- New Exchange with recalculated  NAT_DETECTION_* ----
+      Length + Non-ESP Marker  ----------->
+      INFORMATIONAL
+      HDR, SK { N(UPDATE_SA_ADDRESSES),
+      N(NAT_DETECTION_SOURCE_IP),
+      N(NAT_DETECTION_DESTINATION_IP) }
+
+                               <------- Length + Non-ESP Marker
+                          HDR, SK { N(NAT_DETECTION_SOURCE_IP),
+                              N(NAT_DETECTION_DESTINATION_IP) }
+
+  8)  <---------------------> IKE/ESP Flow <------------------>
         ]]></artwork>
         	</figure>
             <t><list style="numbers">
@@ -1374,6 +1389,13 @@
               message ID and contents.
               </t>
               
+              <t>Once the client receives a response on the
+              TCP-encapsulated connection, it immediately start new INFORMATIONAL
+              exchange with UPDATE_SA_ADDRESSES notify payload and recalculated 
+              NAT_DETECTION_* notify payloads to get correct information about the precense 
+              of NAT.
+              </t>
+
               <t>The IKE and ESP packet flow can resume.</t>
 	        </list>
             </t>
@@ -1383,7 +1405,7 @@
         </section>
 
         <section title="Acknowledgments" numbered="no" anchor="acknowledgments">
-          <t>Thanks to the original authors of RFC8229, Tommy Pauly, Samy Touati, and Ravi Mantha.
+          <t>Thanks to the original authors of RFC 8229, Tommy Pauly, Samy Touati, and Ravi Mantha.
           Since this document updates and obsoletes RFC 8229, most of its text was borrowed
           from the original document.
           </t>
