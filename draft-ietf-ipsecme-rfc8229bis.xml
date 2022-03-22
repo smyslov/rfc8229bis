@@ -650,7 +650,7 @@
           <t>If a NAT is detected due to the SHA-1 digests not matching the
           expected values, no change should be made for encapsulation of
           subsequent IKE or ESP packets, since TCP encapsulation inherently
-          supports NAT traversal. However, for the transport mode IPsec SAs implementations 
+          supports NAT traversal. However, for the transport mode IPsec SAs, implementations 
           need to handle TCP and UDP packet checksum fixup during decapsulation, 
           as defined for UDP encapsulation in <xref target="RFC3948"/>.
           Implementations MAY use the information that
