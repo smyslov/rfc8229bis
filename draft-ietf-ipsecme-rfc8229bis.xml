@@ -257,7 +257,7 @@
         </t>
 
         <section title="TCP-Encapsulated IKE Header Format" anchor="sect-3.1">
-          <figure anchor="figure-1"><artwork><![CDATA[
+          <figure anchor="f-1"><artwork><![CDATA[
                      1                   2                   3
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
                                 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -293,7 +293,7 @@
         </section>
 
         <section title="TCP-Encapsulated ESP Header Format" anchor="sect-3.2">
-          <figure anchor="figure-2"><artwork><![CDATA[
+          <figure anchor="f-2"><artwork><![CDATA[
                      1                   2                   3
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
                                 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -345,7 +345,7 @@
         as possible and not rely on other framing protocols on top of TCP.
         </t>
 
-        <figure anchor="figure-3"><artwork><![CDATA[
+        <figure anchor="f-3"><artwork><![CDATA[
              0      1      2      3      4      5
             +------+------+------+------+------+------+
             | 0x49 | 0x4b | 0x45 | 0x54 | 0x43 | 0x50 |
@@ -413,7 +413,7 @@
           bytes sent on the stream MUST be the stream prefix value (<xref target="sect-4"/>).
           After this prefix, encapsulated IKE messages will negotiate the IKE
           SA and initial Child SA <xref target="RFC7296"/>.  After this point, both
-          encapsulated IKE (<xref target="figure-1" />) and ESP (<xref target="figure-2" />)
+          encapsulated IKE (<xref target="f-1" />) and ESP (<xref target="f-2" />)
            messages will be sent over the TCP connection.  The TCP Responder MUST wait for the entire
           stream prefix to be received on the stream before trying to parse out
           any IKE or ESP messages.  The stream prefix is sent only once, and
@@ -751,9 +751,14 @@
 		  INFORMATIONAL message exchange, the content of the NAT_DETECTION_SOURCE_IP
 		  notification will in most cases be incorrect (since UDP and TCP source ports
 		  will most likely be different), and the peer may incorrectly detect
-		  the presence of a NAT. Section 3.5 of <xref target="RFC4555" /> requires that 
-          a new INFORMATIONAL exchange with the UPDATE_SA_ADDRESSES notify be initiated 
+		  the presence of a NAT. Section 3.5 of <xref target="RFC4555" /> states that 
+          a new INFORMATIONAL exchange with the UPDATE_SA_ADDRESSES notify is initiated 
           in case the address (or transport) is changed while waiting for a response.
+          </t>
+
+          <t>Section 3.5 of <xref target="RFC4555" /> also states that 
+          once an IKE SA is switched to a new IP address, all outstanding requests in this SA 
+          are immediately retransmitted using this address. See also <xref target="retr" />.
           </t>
 
           <t>The MOBIKE protocol defines the NO_NATS_ALLOWED notification that can be
@@ -1031,14 +1036,10 @@
         this document.
         </t>
         
-        <t><list style="hanging" hangIndent="-1">
-          <t hangText="This document updates the reference for TCP port 4500 from RFC 8229 to itself:">
-            <vspace blankLines="0"/>
-          </t>
-          </list>
+        <t>This document updates the reference for TCP port 4500 from RFC 8229 to itself:
         </t>
         
-        <figure anchor="figure-4"><artwork><![CDATA[
+        <figure anchor="f-4"><artwork><![CDATA[
           Keyword       Decimal    Description           Reference
           -----------   --------   -------------------   ---------
           ipsec-nat-t   4500/tcp   IPsec NAT-Traversal   [RFCXXXX]
@@ -1128,7 +1129,7 @@
 
         <section title="Example Exchanges of TCP Encapsulation with TLS 1.3" anchor="tls">
           <section title="Establishing an IKE Session" anchor="sect-b.1">
-            <figure anchor="figure-5"><artwork><![CDATA[
+            <figure anchor="f-5"><artwork><![CDATA[
                 Client                              Server
               ----------                          ----------
   1)  --------------------  TCP Connection  -------------------
@@ -1206,7 +1207,7 @@
           </section>
 
           <section title="Deleting an IKE Session" anchor="sect-b.2">
-            <figure anchor="figure-6"><artwork><![CDATA[
+            <figure anchor="f-6"><artwork><![CDATA[
                 Client                              Server
               ----------                          ----------
   1)  ----------------------- IKE Session ---------------------
@@ -1247,7 +1248,7 @@
           </section>
 
           <section title="Re-establishing an IKE Session" anchor="sect-b.3">
-            <figure anchor="figure-7"><artwork><![CDATA[
+            <figure anchor="f-7"><artwork><![CDATA[
                 Client                              Server
               ----------                          ----------
   1)  --------------------  TCP Connection  -------------------
@@ -1291,7 +1292,7 @@
           </section>
 
           <section title="Using MOBIKE between UDP and TCP Encapsulation" anchor="sect-b.4">
-            <figure anchor="figure-8"><artwork><![CDATA[
+            <figure anchor="f-8"><artwork><![CDATA[
                   Client                              Server
                 ----------                          ----------
       (IP_I1:UDP500 -> IP_R:UDP500)
@@ -1392,7 +1393,7 @@
               <t>Once the client receives a response on the
               TCP-encapsulated connection, it immediately start new INFORMATIONAL
               exchange with UPDATE_SA_ADDRESSES notify payload and recalculated 
-              NAT_DETECTION_* notify payloads to get correct information about the precense 
+              NAT_DETECTION_SOURCE_IP notify payload to get correct information about the precense 
               of NAT.
               </t>
 
