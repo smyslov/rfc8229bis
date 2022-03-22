@@ -742,7 +742,7 @@
           if a connection on a previous network did not use TCP encapsulation.
           </t>
 
-          <t>If the TCP transport was used for the previous network connection, old TCP
+          <t>If the TCP transport was used for the previous network connection, the old TCP
           connection SHOULD be closed by the Initiator once MOBIKE finishes migration 
           to a new connection (either TCP or UDP).
           </t>
