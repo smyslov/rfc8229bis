@@ -1391,7 +1391,7 @@
               </t>
               
               <t>Once the client receives a response on the
-              TCP-encapsulated connection, it immediately start new INFORMATIONAL
+              TCP-encapsulated connection, it immediately starts a new INFORMATIONAL
               exchange with UPDATE_SA_ADDRESSES notify payload and recalculated 
               NAT_DETECTION_SOURCE_IP notify payload to get correct information about the precense 
               of NAT.
