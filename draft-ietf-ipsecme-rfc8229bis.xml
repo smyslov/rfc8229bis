@@ -1394,7 +1394,7 @@
               TCP-encapsulated connection, it immediately starts a new INFORMATIONAL
               exchange with an UPDATE_SA_ADDRESSES notify payload and a recalculated 
               NAT_DETECTION_SOURCE_IP notify payload in order to get correct information about the presence 
-              of NAT.
+              of NATs.
               </t>
 
               <t>The IKE and ESP packet flow can resume.</t>
