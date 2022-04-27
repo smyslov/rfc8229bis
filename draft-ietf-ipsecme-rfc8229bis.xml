@@ -400,7 +400,7 @@
           </t>
 
           <t>When switching from UDP to TCP, a new IKE_SA_INIT exchange MUST be
-          initiated with new Initiator's SPI and with recalculated content of
+          initiated with the Initiator's new SPI and with recalculated content of
           NAT_DETECTION_*_IP notifications.
           </t>
         </section>
@@ -424,9 +424,9 @@
           SHOULD gracefully tear down IKE SAs with DELETE payloads.  Once the
           SA has been deleted, the TCP Originator SHOULD close the TCP
           connection if it does not intend to use the connection for another
-          IKE session to the TCP Responder.  If the TCP connection is no more 
+          IKE session to the TCP Responder.  If the TCP connection is no longer 
           associated with any active IKE SA, the TCP Responder MAY close the connection 
-          to clean up resources if TCP Originator didn't close it within some reasonable period of time.
+          to clean up resources if TCP Originator didn't close it within some reasonable period of time (e.g. few seconds).
           </t>
 
           <t>An unexpected FIN or a TCP Reset on the TCP connection may indicate a
@@ -563,9 +563,8 @@
           <t>The following considerations are applicable for using Cookie and
           Puzzle mechanisms in case of TCP encapsulation:
           <list style="symbols" >
-            <t>the exchange Responder SHOULD NOT request a Cookie, with the
-			exception of Puzzles or in rare cases like preventing TCP Sequence
-			Number attacks.
+            <t>the exchange Responder SHOULD NOT send an IKEv2 Cookie request without an accompanied Puzzle;
+		    an example of an exception to this rule may be a mitigation against TCP Sequence Number attacks.
             </t>
             <t>if the Responder chooses to send Cookie request (possibly along
             with Puzzle request), then the TCP connection that the IKE_SA_INIT
@@ -590,7 +589,7 @@
           that won't work with TCP encapsulation. Note also that these 
           examples include the Initiator's IP address in Cookie calculation.
           In general this address may change between two initial requests (with and without Cookies).
-          This may happen due to NATs, since NATs have more freedom to change change source IP addresses for new
+          This may happen due to NATs, since NATs have more freedom to change source IP addresses for new
           TCP connections than for UDP. In such cases cookie verification might fail.
           </t>
 
@@ -677,7 +676,7 @@
 
           <t>Note that, depending on the configuration of TCP and TLS on the
           connection, TCP keep-alives <xref target="RFC1122"/> and TLS keep-alives <xref target="RFC6520"/>
-          may be used.  These MUST NOT be used as indications of IKE peer
+          MAY be used.  These MUST NOT be used as indications of IKE peer
           liveness, for which purpose the standard IKEv2 mechanism of exchanging empty INFORMATIONAL messages is used
           (see Section 1.4 of <xref target="RFC7296" />).
           </t>
@@ -709,7 +708,7 @@
           </list>
           </t>
 
-          <t>Besides, TCP encapsulation of IPsec packets may have implications
+          <t>TCP encapsulation of IPsec packets may have implications
           on performance of the encapsulated traffic. Performance considerations
           are discussed in <xref target="perf" />.
           </t>
@@ -741,6 +740,12 @@
           the ESP packets should be sent over the TCP connection, regardless of
           if a connection on a previous network did not use TCP encapsulation.
           </t>
+		
+	<t>The value of timeout and the number of retransmissions may vary depending on the 
+	initiator's configuration, but it is expected that the initiators would try to 
+	get response over UDP for at least half a minute sending at least dozen retransmissions
+	before switching to TCP.
+	</t>
 
           <t>If the TCP transport was used for the previous network connection, the old TCP
           connection SHOULD be closed by the Initiator once MOBIKE finishes migration 
@@ -804,7 +809,7 @@
           are given in Section 5 of <xref target="RFC5723"/>).  
           </t>
 
-          <t>Since network conditions may change while the client is incative,
+          <t>Since network conditions may change while the client is inactive,
           the fact that TCP encapsulation was used in an old SA SHOULD NOT affect which transport
           is used during session resumption. In other words, the transport should be 
           selected as if the IKE SA is being created from scratch.
