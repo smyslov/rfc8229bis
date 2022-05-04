@@ -14,6 +14,17 @@
 
     <front>
         <title abbrev="TCP Encapsulation of IKE and IPsec Packets">TCP Encapsulation of IKE and IPsec Packets</title>
+        <author fullname="Tommy Pauly" initials="T." surname="Pauly">
+            <organization>Apple Inc.</organization>
+            <address>
+                <postal>
+                    <street>1 Infinite Loop</street>
+                    <city>Cupertino, California  95014</city>
+                    <country>United States of America</country>
+                </postal>
+                <email>tpauly@apple.com</email>
+            </address>
+        </author>
         <author initials='V.' surname="Smyslov" fullname='Valery Smyslov'>
             <organization>ELVIS-PLUS</organization>
             <address>
@@ -25,17 +36,6 @@
                 </postal>
                 <phone>+7 495 276 0211</phone>
                 <email>svan@elvis.ru</email>
-            </address>
-        </author>
-        <author fullname="Tommy Pauly" initials="T." surname="Pauly">
-            <organization>Apple Inc.</organization>
-            <address>
-                <postal>
-                    <street>1 Infinite Loop</street>
-                    <city>Cupertino, California  95014</city>
-                    <country>United States of America</country>
-                </postal>
-                <email>tpauly@apple.com</email>
             </address>
         </author>
         <date/>
