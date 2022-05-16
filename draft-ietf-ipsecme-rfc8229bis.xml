@@ -741,11 +741,11 @@
           if a connection on a previous network did not use TCP encapsulation.
           </t>
 		
-	<t>The value of timeout and the number of retransmissions may vary depending on the 
-	initiator's configuration, but it is expected that the initiators would try to 
-	get response over UDP for at least half a minute sending at least dozen retransmissions
-	before switching to TCP.
-	</t>
+          <t>The value of the timeout and the specific number of retransmissions before switching to
+          TCP can vary depending on the Initiator's configuration. Implementations ought to provide
+          reasonable defaults to ensure that UDP attempts have a chance to succeed, but can shorten
+          the timeout based on historical data or metrics.
+          </t>
 
           <t>If the TCP transport was used for the previous network connection, the old TCP
           connection SHOULD be closed by the Initiator once MOBIKE finishes migration 
