@@ -564,7 +564,7 @@
           Puzzle mechanisms in case of TCP encapsulation:
           <list style="symbols" >
             <t>the exchange Responder SHOULD NOT send an IKEv2 Cookie request without an accompanied Puzzle;
-		    an example of an exception to this rule may be a mitigation against TCP Sequence Number attacks.
+		    implementations might choose to have exceptions to this for cases like mitigating TCP Sequence Number attacks.
             </t>
             <t>if the Responder chooses to send Cookie request (possibly along
             with Puzzle request), then the TCP connection that the IKE_SA_INIT
