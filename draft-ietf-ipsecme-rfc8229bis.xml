@@ -426,7 +426,7 @@
           connection if it does not intend to use the connection for another
           IKE session to the TCP Responder.  If the TCP connection is no longer 
           associated with any active IKE SA, the TCP Responder MAY close the connection 
-          to clean up resources if TCP Originator didn't close it within some reasonable period of time (e.g. few seconds).
+          to clean up resources if TCP Originator didn't close it within some reasonable period of time (e.g., a few seconds).
           </t>
 
           <t>An unexpected FIN or a TCP Reset on the TCP connection may indicate a
