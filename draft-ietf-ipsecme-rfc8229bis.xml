@@ -171,28 +171,29 @@
           </t>
 
         </section>
-      </section>
+	      
+        <section anchor="mustshouldmay" title="Terminology and Notation">
+          <t> This document distinguishes between the IKE peer that initiates TCP
+          connections to be used for TCP encapsulation and the roles of
+          Initiator and Responder for particular IKE messages.  During the
+          course of IKE exchanges, the role of IKE Initiator and Responder may
+          swap for a given SA (as with IKE SA rekeys), while the Initiator of
+          the TCP connection is still responsible for tearing down the TCP
+          connection and re-establishing it if necessary.  For this reason,
+          this document will use the term "TCP Originator" to indicate the IKE
+          peer that initiates TCP connections.  The peer that receives TCP
+          connections will be referred to as the "TCP Responder".  If an IKE SA
+          is rekeyed one or more times, the TCP Originator MUST remain the peer
+          that originally initiated the first IKE SA.
+          </t>
 
-      <section anchor="mustshouldmay" title="Terminology and Notation">
-        <t> This document distinguishes between the IKE peer that initiates TCP
-        connections to be used for TCP encapsulation and the roles of
-        Initiator and Responder for particular IKE messages.  During the
-        course of IKE exchanges, the role of IKE Initiator and Responder may
-        swap for a given SA (as with IKE SA rekeys), while the Initiator of
-        the TCP connection is still responsible for tearing down the TCP
-        connection and re-establishing it if necessary.  For this reason,
-        this document will use the term "TCP Originator" to indicate the IKE
-        peer that initiates TCP connections.  The peer that receives TCP
-        connections will be referred to as the "TCP Responder".  If an IKE SA
-        is rekeyed one or more times, the TCP Originator MUST remain the peer
-        that originally initiated the first IKE SA.
-        </t>
+          <t> The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", 
+          "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted 
+          as described in BCP 14 <xref target="RFC2119" /> <xref target="RFC8174" /> when, and only when, 
+          they appear in all capitals, as shown here.
+          </t>
+        </section>
 
-        <t> The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", 
-        "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted 
-        as described in BCP 14 <xref target="RFC2119" /> <xref target="RFC8174" /> when, and only when, 
-        they appear in all capitals, as shown here.
-        </t>
       </section>
 
 
