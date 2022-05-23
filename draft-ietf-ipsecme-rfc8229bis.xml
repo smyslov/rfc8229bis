@@ -1001,8 +1001,14 @@
       <section title="Security Considerations" anchor="sect-13">
         <t>IKE Responders that support TCP encapsulation may become vulnerable
         to new Denial-of-Service (DoS) attacks that are specific to TCP, such
-        as SYN-flooding attacks.  TCP Responders should be aware of this
-        additional attack surface.
+        as SYN-flooding attacks. TCP Responders should be aware of this additional attack surface.
+	</t>
+		
+        <t>TCP connections are also susceptible to RST and other spoofing attacks <xref target="RFC4953" />.
+        Data injection attacks are not possible, but all the rest of the TCP machinery remains vulnerable.
+        This specification makes IPsec tolerable to sudden TCP connection drop, but if an attacker
+        is able to tear down TCP connections on its will, this can affect performance of IPsec connection, 
+        which may end up with a DoS-like attack.
         </t>
         
         <t>TCP Responders should be careful to ensure that (1) the stream prefix
@@ -1073,6 +1079,7 @@
             <?rfc include="https://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.3168.xml" ?>
             <?rfc include="https://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.4555.xml" ?>
             <?rfc include="https://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.4621.xml" ?>
+            <?rfc include="https://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.4953.xml" ?>
             <?rfc include="https://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.4987.xml" ?>
             <?rfc include="https://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.5246.xml" ?>
             <?rfc include="https://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.5685.xml" ?>
@@ -1427,7 +1434,7 @@
           thanks to Eric Kinnear for his implementation work.
           </t>
 
-          <t>The authors would like to thank Tero Kivinen and Paul Wouters for their
+          <t>The authors would like to thank Tero Kivinen, Paul Wouters, and Joseph Touch for their
           valuable comments while preparing this document.
           </t>
         </section>
