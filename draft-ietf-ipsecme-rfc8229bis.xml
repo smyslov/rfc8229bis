@@ -969,17 +969,6 @@
           sending rate than the outer TCP would allow for.
           </t>
 
-          <!--
-          <t>TCP-in-TCP can also lead to increased buffering, or bufferbloat.
-          This can occur when the window size of the outer TCP connection is
-          reduced and becomes smaller than the window sizes of the inner TCP
-          connections.  This can lead to packets backing up in the outer TCP
-          connection's send buffers.  In order to limit this effect, the outer
-          TCP connection should have limits on its send buffer size and on the
-          rate at which it reduces its window size.
-          </t>
-          -->
-
           <t> TCP-in-TCP can also lead to “TCP meltdown”, where stacked instances 
           of TCP can result in significant impacts to performance <xref target="TCP-MELTDOWN" />.
           For the case in this document, such meltdown can occur when the window 
