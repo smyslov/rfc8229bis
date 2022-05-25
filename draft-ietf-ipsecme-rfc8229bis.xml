@@ -272,7 +272,7 @@
 
         <t>Due to the fact that the Length field is 16-bit and includes both the message length and the 
         length of the field itself, it is impossible to encapsulate messages greater than 65533 
-        octets in length. In most cases this is not a problem. Note also, that similar
+        octets in length. In most cases, this is not a problem. Note also that a similar
         limitation exists for encapsulation ESP in UDP <xref target="RFC3948" />.
 		</t>
 
