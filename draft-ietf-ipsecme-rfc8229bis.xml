@@ -276,7 +276,7 @@
         limitation exists for encapsulation ESP in UDP <xref target="RFC3948" />.
 		</t>
 
-        <t>The minimal size of a legal encapsulated message is 1 octet 
+        <t>The minimum size of an encapsulated message is 1 octet 
         (NAT keep-alive packets, see <xref target="dpd-nat-ka" />). Empty messages 
         (where the Length field equals to 2) MUST be silently ignored by receiver. 
         </t>
