@@ -1052,7 +1052,7 @@
 		
         <t>TCP connections are also susceptible to RST and other spoofing attacks <xref target="RFC4953" />.
         Data injection attacks are not possible, but all the rest of the TCP machinery remains vulnerable.
-        This specification makes IPsec tolerable to sudden TCP connection drop, but if an attacker
+        This specification makes IPsec tolerant of sudden TCP connection drops, but if an attacker
         is able to tear down TCP connections on its will, this can affect performance of IPsec connection, 
         which may end up with a DoS-like attack.
         </t>
