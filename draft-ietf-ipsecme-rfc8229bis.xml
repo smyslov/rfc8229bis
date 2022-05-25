@@ -723,7 +723,7 @@
             header, and usually the stack ensures that the DF bit is set for TCP
             packets to avoid IP fragmentation. Note, that this behavior is 
             compliant with generic tunneling considerations, since the outer TCP header acts
-            as a link layer protocol and its frag/reassembly need have no correlation to
+            as a link-layer protocol and its fragmentation and reassembly have no correlation with
             the inner payload. 
             </t>
 
