@@ -177,7 +177,7 @@
             (Sections <xref format = "counter" target="fallback" />, <xref format = "counter" target="nat-det" />, 
             and <xref format = "counter" target="mobike" />)</t>
             <t>Retransmission behavior is clarified (<xref target="retr" />)</t>
-            <t>Using cookie and puzzles is described in more detail (<xref target="cookie-puzzle" />)</t>
+            <t>The use of cookies and puzzles is described in more detail (<xref target="cookie-puzzle" />)</t>
             <t>Error handling is clarified (<xref target="errors" />)</t>
             <t>Implications of TCP encapsulation on IPsec SA processing are expanded (<xref target="ipsec" />)</t>
             <t><xref target="extensions" /> describing interactions with other IKEv2 extensions is added</t>
