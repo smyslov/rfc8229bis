@@ -182,7 +182,7 @@
             <t>Implications of TCP encapsulation on IPsec SA processing are expanded (<xref target="ipsec" />)</t>
             <t><xref target="extensions" /> describing interactions with other IKEv2 extensions is added</t>
             <t>Interaction of TCP encapsulation with MOBIKE is clarified (<xref target="mobike" />)</t>
-            <t>Recommendation for TLS encapsulation (<xref target="tls" />) now include TLS 1.3</t>
+            <t>The recommendation for TLS encapsulation (<xref target="tls" />) now includes TLS 1.3</t>
             <t>Examples of TLS encapsulation are provided using TLS 1.3 (<xref target="tls-example" />)</t>
           </list>
           </t>
