@@ -1065,7 +1065,11 @@
           then in most cases this will result in failure to establish IKE SA, often with false "authentication failed" diagnostics
           </t>
         </list>
-        An attacker capable of blocking UDP traffic can force peers to use TCP encapsulation,
+        Note, that data injection attacks are also possible on IP level (e.g. when IP fragmentation is used)
+        resulting in DoS attack even if TCP encapsulation is not used.
+        </t>
+
+        <t>An attacker capable of blocking UDP traffic can force peers to use TCP encapsulation,
         thus degrading the performance and making the connection more vulnerable to DoS attacks.
         Note, that attacker capable to modify packets on the wire or to block them can
         prevent peers to communicate regardless of the transport being used.
