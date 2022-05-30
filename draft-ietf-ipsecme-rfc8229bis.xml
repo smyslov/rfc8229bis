@@ -1040,10 +1040,35 @@
         </t>
 		
         <t>TCP connections are also susceptible to RST and other spoofing attacks <xref target="RFC4953" />.
-        Data injection attacks are not possible, but all the rest of the TCP machinery remains vulnerable.
         This specification makes IPsec tolerant of sudden TCP connection drops, but if an attacker
         is able to tear down TCP connections, IPsec connection's performance can suffer, 
         effectively making this a DoS attack.
+        </t>
+
+        <t>TCP data injection attacks have no effect on application data since IPsec provides data integrity.
+        However, they can have some effect, mostly as a DoS attack:
+        <list style="symbols">
+          <t>if an attacker alters the content of the Length field that separates packets,
+          then the receiver will incorrectly identify the margins of the following packets and 
+          will drop all of them or even tear down the TCP connection if the content of the
+          Length field happens to be 0 or 1 (see <xref target="format"/>)
+          </t>
+          <t>if the content of an IKE message is altered, then it will be dropped by the receiver;
+          if the dropped message is the IKE request message, then the initiator will tear 
+          down the IKE SA after some timeout, since in most cases the request message will not be retransmitted
+          (as advised in <xref target="retr"/>) and thus the response will bever be received
+          </t>
+          <t>if an attacker alters the non-ESP marker then IKE packets will be dispatched to ESP
+          and sometimes visa versa, those packets will be dropped
+          </t>
+          <t>if an attacker modifies TCP-Encapsulated stream prefix or unencrypted IKE messages before IKE SA is established, 
+          then in most cases this will result in failure to establish IKE SA, often with false "authentication failed" diagnostics
+          </t>
+        </list>
+        An attacker capable of blocking UDP traffic can force peers to use TCP encapsulation,
+        thus degrading the performance and making the connection more vulnirable to DoS attacks.
+        Note, that attacker capable to modify packets on the wire or to block them can
+        prevent peers to communicate regardless of the transport being used.
         </t>
         
         <t>TCP Responders should be careful to ensure that (1) the stream prefix
@@ -1467,9 +1492,10 @@
           thanks to Eric Kinnear for his implementation work.
           </t>
 
-          <t>The authors would like to thank Tero Kivinen, Paul Wouters, and Joseph Touch for their
+          <t>The authors would like to thank Tero Kivinen, Paul Wouters, Joseph Touch, and Christian Huitema for their
           valuable comments while preparing this document.
           </t>
         </section>
     </back>
 </rfc>
+
