@@ -1042,7 +1042,7 @@
         <t>TCP connections are also susceptible to RST and other spoofing attacks <xref target="RFC4953" />.
         This specification makes IPsec tolerant of sudden TCP connection drops, but if an attacker
         is able to tear down TCP connections, IPsec connection's performance can suffer, 
-        effectively making this a DoS attack.
+        effectively making this a DoS attack. 
         </t>
 
         <t>TCP data injection attacks have no effect on application data since IPsec provides data integrity.
@@ -1065,8 +1065,12 @@
           then in most cases this will result in failure to establish IKE SA, often with false "authentication failed" diagnostics
           </t>
         </list>
+        <xref target="RFC5961" /> discusses how TCP injection attacks can be mitigated.
+        </t>
+        <t>
         Note, that data injection attacks are also possible on IP level (e.g. when IP fragmentation is used)
-        resulting in DoS attack even if TCP encapsulation is not used.
+        resulting in DoS attack even if TCP encapsulation is not used. On the other hand, TCP injection attacks are easier to mount 
+        than the IP fragmentation injection attacks, because TCP keeps a long receive window open that’s a sitting target for such attacks. 
         </t>
 
         <t>An attacker capable of blocking UDP traffic can force peers to use TCP encapsulation,
@@ -1148,6 +1152,7 @@
             <?rfc include="https://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.5246.xml" ?>
             <?rfc include="https://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.5685.xml" ?>
             <?rfc include="https://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.5723.xml" ?>
+            <?rfc include="https://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.5961.xml" ?>
             <?rfc include="https://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.6311.xml" ?>
             <?rfc include="https://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.6520.xml" ?>
             <?rfc include="https://xml2rfc.ietf.org/public/rfc/bibxml/reference.RFC.6528.xml" ?>
