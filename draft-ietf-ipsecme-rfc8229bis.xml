@@ -1081,6 +1081,9 @@
         take several minutes and may result in IKE SA deletion and re-creation. To speed up the recovery, in case of TCP encapsulation 
         the receiver SHOULD reset the TCP connection if an incoming packet contains an ESP SPI which doesn't correspond to any incoming ESP SA it has. 
         Once the TCP connection is reset it will be re-created by TCP Originator as described in <xref target="establish" />.
+        Alternatively, the receiver MAY try to re-sync after it receives unknown SPI by searching the TCP stream
+        for a 64 bit binary vector consisting of a combination of a any SPI it knows (32 bits) and a valid SN for this SPI (another 32 bits) 
+        and try to validate the ICV of a packet candidate taking the preceeding 16 bits as a length of this packet.
         </t>
 
         <t>An attacker capable of blocking UDP traffic can force peers to use TCP encapsulation,
