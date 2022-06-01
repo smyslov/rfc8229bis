@@ -266,7 +266,7 @@
         implementations SHOULD limit message lengths to typical UDP datagram
         ESP payload lengths. The maximum message length is used as the effective MTU 
         for connections that are being encrypted using ESP, 
-        so the maximum message length will influence characteristics of inner
+        so the maximum message length will influence characteristics of these
         connections, such as the TCP Maximum Segment Size (MSS).
         </t>
 
@@ -627,7 +627,7 @@
           <section title="Statelessness versus Delay of SA Establishment" anchor="tradeoff" >
             <t>
             There is a trade-off in choosing the period of time after which
-            TCP connection is closed. If it is too short, then the proper Initiator
+            the TCP connection is closed. If it is too short, then the proper Initiator
             which repeats its request would need to re-establish the TCP connection
             introducing additional delay. On the other hand, if it is too long, then 
             the Responder's resources would be wasted in case the Initiator never comes back.
@@ -719,7 +719,7 @@
             <t>Section 8.1 of <xref target="RFC4301"/> requires all tunnel mode IPsec SAs to
             be able to copy the Don't Fragment (DF) bit from inner IP header to
             the outer (tunnel) one.  With TCP encapsulation this is generally
-            not possible, because TCP/IP stack manages DF bit in the outer IP
+            not possible, because the TCP/IP stack manages DF bit in the outer IP
             header, and usually the stack ensures that the DF bit is set for TCP
             packets to avoid IP fragmentation. Note, that this behavior is 
             compliant with generic tunneling considerations, since the outer TCP header acts
@@ -886,7 +886,7 @@
           the liveness check should be periodically performed even if the
           client has nothing to send over ESP.  The frequency of sending such
           messages should be high enough to allow quick detection and restoring
-          of broken TCP connection.
+          of broken TCP connections.
           </t>
         </section>
 
@@ -923,7 +923,7 @@
 
         <t>A network device that monitors the transport layer will track the
         state of TCP sessions, such as TCP sequence numbers.  TCP
-        encapsulation of IKE should therefore use standard TCP behaviors to
+        encapsulation of IKE should therefore use common TCP behaviors to
         avoid being dropped by middleboxes.
         </t>
       </section>
@@ -1049,7 +1049,7 @@
         However, they can have some effect, mostly by creating DoS attacks:
         <list style="symbols">
           <t>if an attacker alters the content of the Length field that separates packets,
-          then the receiver will incorrectly identify the margins of the following packets and 
+          then the receiver will incorrectly identify the boundaries of the following packets and 
           will drop all of them or even tear down the TCP connection if the content of the
           Length field happens to be 0 or 1 (see <xref target="format"/>)
           </t>
@@ -1067,10 +1067,20 @@
         </list>
         <xref target="RFC5961" /> discusses how TCP injection attacks can be mitigated.
         </t>
-        <t>
-        Note, that data injection attacks are also possible on IP level (e.g. when IP fragmentation is used)
+
+        <t>Note, that data injection attacks are also possible on IP level (e.g. when IP fragmentation is used)
         resulting in DoS attack even if TCP encapsulation is not used. On the other hand, TCP injection attacks are easier to mount 
         than the IP fragmentation injection attacks, because TCP keeps a long receive window open that’s a sitting target for such attacks. 
+        </t>
+
+        <t>If an attcker successfully mounts an injection attack on a TCP connection encapsulating IPsec traffic, 
+        and a Length field in the TCP stream is changed as a result of this attack, then the receiver 
+        in most cases will not be able to correctly identify the boundaries of the following packets in the stream,
+        because it will try to parse an arbitrary data (the result of encryption) as ESP (or IKE) header.
+        This will fail and for this reason all the following packets will be dropped. Eventually the situation should self-recover, but it may 
+        take several minutes and may result in IKE SA deletion and re-creation. To speed up the recovery, in case of TCP encapsulation 
+        the receiver SHOULD reset the TCP connection if an incoming packet contains an ESP SPI which doesn't correspond to any incoming ESP SA it has. 
+        Once the TCP connection is reset it will be re-created by TCP Originator as described in <xref target="establish" />.
         </t>
 
         <t>An attacker capable of blocking UDP traffic can force peers to use TCP encapsulation,
