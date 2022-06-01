@@ -1046,7 +1046,7 @@
         </t>
 
         <t>TCP data injection attacks have no effect on application data since IPsec provides data integrity.
-        However, they can have some effect, mostly as a DoS attack:
+        However, they can have some effect, mostly by creating DoS attacks:
         <list style="symbols">
           <t>if an attacker alters the content of the Length field that separates packets,
           then the receiver will incorrectly identify the margins of the following packets and 
