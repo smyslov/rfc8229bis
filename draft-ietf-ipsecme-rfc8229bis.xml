@@ -1073,7 +1073,7 @@
         than the IP fragmentation injection attacks, because TCP keeps a long receive window open that’s a sitting target for such attacks. 
         </t>
 
-        <t>If an attcker successfully mounts an injection attack on a TCP connection encapsulating IPsec traffic, 
+        <t>If an attacker successfully mounts an injection attack on a TCP connection encapsulating IPsec traffic, 
         and a Length field in the TCP stream is changed as a result of this attack, then the receiver 
         in most cases will not be able to correctly identify the boundaries of the following packets in the stream,
         because it will try to parse an arbitrary data (the result of encryption) as ESP (or IKE) header.
@@ -1084,9 +1084,9 @@
         Once the TCP connection is reset it will be re-created by TCP Originator as described in <xref target="establish" />.
         Alternatively, implementations MAY try to re-sync after they received unknown SPI by searching the TCP stream
         for a 64 bit binary vector consisting of a combination of some SPI they know (first 32 bits) and a valid (E)SN for this SPI (another 32 bits) 
-        and try to validate the ICV of a packet candidate taking the preceeding 16 bits as a Length field.
-        They can also serach for 4 bytes of zero (non-ESP marker) followed by 128 bits of IKE SPIs of IKE SA associated with this stream
-        and try to validate ICV of this IKE message candidate taking the preceeding 16 bits as a Length field.
+        and try to validate the ICV of a packet candidate taking the preceding 16 bits as a Length field.
+        They can also search for 4 bytes of zero (non-ESP marker) followed by 128 bits of IKE SPIs of IKE SA associated with this stream
+        and try to validate ICV of this IKE message candidate taking the preceding 16 bits as a Length field.
         </t>
 
         <t>An attacker capable of blocking UDP traffic can force peers to use TCP encapsulation,
