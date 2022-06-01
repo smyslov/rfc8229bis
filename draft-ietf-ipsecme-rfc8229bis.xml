@@ -1083,9 +1083,9 @@
         incoming packets contain ESP SPIs which don't match to any of incoming ESP SAs they have.
         Once the TCP connection is reset it will be re-created by TCP Originator as described in <xref target="establish" />.
         Alternatively, implementations MAY try to re-sync after they received unknown SPI by searching the TCP stream
-        for a 64 bit binary vector consisting of a combination of some SPI they know (first 32 bits) and a valid Sequence Number for this SPI 
-        (another 32 bits) and try to validate the ICV of a packet candidate taking the preceding 16 bits as a Length field.
-        They can also search for 4 bytes of zero (non-ESP marker) followed by 128 bits of IKE SPIs of IKE SA associated with this stream
+        for a 64 bit binary vector consisting of some SPI they know (first 32 bits) and a valid Sequence Number for this SPI 
+        (second 32 bits) and try to validate the ICV of a packet candidate taking the preceding 16 bits as a Length field.
+        They can also search for 4 bytes of zero (non-ESP marker) followed by 128 bits of IKE SPIs of IKE SA associated with this TCP stream
         and try to validate ICV of this IKE message candidate taking the 16 bits preceding the non-ESP marker as a Length field.
         </t>
 
