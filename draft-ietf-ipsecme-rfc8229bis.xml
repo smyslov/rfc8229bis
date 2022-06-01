@@ -1079,7 +1079,7 @@
         because it will try to parse an arbitrary data (the result of encryption) as ESP (or IKE) header.
         This will fail and for this reason all the following packets will be dropped. Eventually the situation should self-recover, but it may 
         take several minutes and may result in IKE SA deletion and re-creation. To speed up the recovery implementations are advised
-        fo follow recommendations in <xref target="establish" /> and to reset TCP connection in case 
+        to follow recommendations in <xref target="establish" /> and to reset TCP connection in case 
         incoming packets contain an ESP SPI which doesn't correspond to any incoming ESP SA they have.
         Once the TCP connection is reset it will be re-created by TCP Originator as described in <xref target="establish" />.
         Alternatively, implementations MAY try to re-sync after they received unknown SPI by searching the TCP stream
