@@ -1080,7 +1080,7 @@
         This will fail and for this reason all the following packets will be dropped. Eventually the situation should self-recover, but it may 
         take several minutes and may result in IKE SA deletion and re-creation. To speed up the recovery implementations are advised
         to follow recommendations in <xref target="establish" /> and to reset TCP connection in case 
-        incoming packets contain an ESP SPI which doesn't correspond to any incoming ESP SA they have.
+        incoming packets contain ESP SPIs which don't match to any of incoming ESP SAs they have.
         Once the TCP connection is reset it will be re-created by TCP Originator as described in <xref target="establish" />.
         Alternatively, implementations MAY try to re-sync after they received unknown SPI by searching the TCP stream
         for a 64 bit binary vector consisting of a combination of some SPI they know (first 32 bits) and a valid (E)SN for this SPI (another 32 bits) 
