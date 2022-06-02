@@ -444,7 +444,7 @@
           After this prefix, encapsulated IKE messages will negotiate the IKE
           SA and initial Child SA <xref target="RFC7296"/>.  After this point, both
           encapsulated IKE (<xref target="figure-format-ike" />) and ESP (<xref target="figure-format-esp" />)
-           messages will be sent over the TCP connection.  The TCP Responder MUST wait for the entire
+          messages will be sent over the TCP connection.  The TCP Responder MUST wait for the entire
           stream prefix to be received on the stream before trying to parse out
           any IKE or ESP messages.  The stream prefix is sent only once, and
           only by the TCP Originator.
@@ -496,7 +496,7 @@
           connection can be determined to be corrupted if there are too many
           subsequent messages that cannot be parsed as valid IKE messages or
           ESP messages with known SPIs, or if the authentication check for an
-          ESP message with a known SPI fails.  Implementations SHOULD NOT
+          IKE message or ESP message with a known SPI fails.  Implementations SHOULD NOT
           tear down a connection if only a single ESP message has an unknown
           SPI, since the SPI databases may be momentarily out of sync.  If
           there is instead a syntax issue within an IKE message, an
@@ -1079,13 +1079,13 @@
         because it will try to parse an arbitrary data (the result of encryption) as ESP (or IKE) header.
         This will fail and for this reason all the following packets will be dropped. Eventually the situation should self-recover, but it may 
         take several minutes and may result in IKE SA deletion and re-creation. To speed up the recovery implementations are advised
-        to follow recommendations in <xref target="establish" /> and to reset TCP connection in case 
+        to follow recommendations in <xref target="establish" /> and to close the TCP connection in case 
         incoming packets contain ESP SPIs which don't match to any of incoming ESP SAs they have.
-        Once the TCP connection is reset it will be re-created by TCP Originator as described in <xref target="establish" />.
+        Once the TCP connection is closed it will be re-created by TCP Originator as described in <xref target="establish" />.
         Alternatively, implementations MAY try to re-sync after they received unknown SPI by searching the TCP stream
-        for a 64 bit binary vector consisting of some SPI they know (first 32 bits) and a valid Sequence Number for this SPI 
+        for a 64 bit binary vector consisting of an SPI they know (first 32 bits) and a valid Sequence Number for this SPI 
         (second 32 bits) and try to validate the ICV of a packet candidate taking the preceding 16 bits as a Length field.
-        They can also search for 4 bytes of zero (non-ESP marker) followed by 128 bits of IKE SPIs of IKE SA associated with this TCP stream
+        They can also search for 4 bytes of zero (non-ESP marker) followed by 128 bits of IKE SPIs of IKE SA associated with this TCP connection
         and try to validate ICV of this IKE message candidate taking the 16 bits preceding the non-ESP marker as a Length field.
         </t>
 
