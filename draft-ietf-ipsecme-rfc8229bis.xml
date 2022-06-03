@@ -1078,15 +1078,24 @@
         in most cases will not be able to correctly identify the boundaries of the following packets in the stream,
         because it will try to parse an arbitrary data (the result of encryption) as ESP (or IKE) header.
         This will fail and for this reason all the following packets will be dropped. Eventually the situation should self-recover, but it may 
-        take several minutes and may result in IKE SA deletion and re-creation. To speed up the recovery implementations are advised
-        to follow recommendations in <xref target="establish" /> and to close the TCP connection in case 
-        incoming packets contain ESP SPIs which don't match to any of incoming ESP SAs they have.
+        take several minutes and may result in IKE SA deletion and re-creation.
+        </t>
+
+        <t>To speed up the recovery implementations are advised to follow recommendations in <xref target="establish" /> and to close 
+        the TCP connection in case incoming packets contain SPIs which don't match to any of the SAs they have.
         Once the TCP connection is closed it will be re-created by TCP Originator as described in <xref target="establish" />.
-        Alternatively, implementations MAY try to re-sync after they received unknown SPI by searching the TCP stream
-        for a 64 bit binary vector consisting of an SPI they know (first 32 bits) and a valid Sequence Number for this SPI 
-        (second 32 bits) and try to validate the ICV of a packet candidate taking the preceding 16 bits as a Length field.
+        </t>
+
+        <t>Alternatively, implementations MAY try to re-sync after they received unknown SPI by searching the TCP stream
+        for a 64 bit binary vector consisting of one of SPIs they know (first 32 bits) and a valid Sequence Number for this SPI 
+        (second 32 bits) and try to validate the ICV of this packet candidate taking the preceding 16 bits as the Length field.
         They can also search for 4 bytes of zero (non-ESP marker) followed by 128 bits of IKE SPIs of IKE SA associated with this TCP connection
-        and try to validate ICV of this IKE message candidate taking the 16 bits preceding the non-ESP marker as a Length field.
+        and try to validate ICV of this IKE message candidate taking the 16 bits preceding the non-ESP marker as the Length field.
+<!--        Implementations may try to optimize the search process by looking only at the beginning of received TCP segments 
+        (in case they are tightly coupled with the TCP/IP stack and know where TCP segment boundaries are). 
+        (It was Joe's idea, I'm not sure we need to mention it here) -->
+        Implementations SHOULD limit the attempts to resync, since if the injection attack is ongoing 
+        then there is a high probability that the resync process will never succeed.
         </t>
 
         <t>An attacker capable of blocking UDP traffic can force peers to use TCP encapsulation,
