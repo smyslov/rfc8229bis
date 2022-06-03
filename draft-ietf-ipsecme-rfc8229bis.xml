@@ -287,7 +287,7 @@
         </t>
 
         <section title="TCP-Encapsulated IKE Header Format" anchor="format-ike">
-          <figure title="IKE header format for TCP encapsulation" anchor="figure-format-ike"><artwork><![CDATA[
+          <figure title="IKE header format for TCP encapsulation" anchor="f-format-ike"><artwork><![CDATA[
                      1                   2                   3
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
                                 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -323,7 +323,7 @@
         </section>
 
         <section title="TCP-Encapsulated ESP Header Format" anchor="format-esp">
-          <figure title="ESP header format for TCP encapsulation" anchor="figure-format-esp"><artwork><![CDATA[
+          <figure title="ESP header format for TCP encapsulation" anchor="f-format-esp"><artwork><![CDATA[
                      1                   2                   3
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
                                 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -375,7 +375,7 @@
         as possible and not rely on other framing protocols on top of TCP.
         </t>
 
-        <figure title="TCP-Encapsulated Stream Prefix" anchor="figure-prefix"><artwork><![CDATA[
+        <figure title="TCP-Encapsulated Stream Prefix" anchor="f-prefix"><artwork><![CDATA[
              0      1      2      3      4      5
             +------+------+------+------+------+------+
             | 0x49 | 0x4b | 0x45 | 0x54 | 0x43 | 0x50 |
@@ -443,7 +443,7 @@
           bytes sent on the stream MUST be the stream prefix value (<xref target="prefix"/>).
           After this prefix, encapsulated IKE messages will negotiate the IKE
           SA and initial Child SA <xref target="RFC7296"/>.  After this point, both
-          encapsulated IKE (<xref target="figure-format-ike" />) and ESP (<xref target="figure-format-esp" />)
+          encapsulated IKE (<xref target="f-format-ike" />) and ESP (<xref target="f-format-esp" />)
           messages will be sent over the TCP connection.  The TCP Responder MUST wait for the entire
           stream prefix to be received on the stream before trying to parse out
           any IKE or ESP messages.  The stream prefix is sent only once, and
