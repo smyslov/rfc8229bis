@@ -1073,12 +1073,11 @@
         than the IP fragmentation injection attacks, because TCP keeps a long receive window open that’s a sitting target for such attacks. 
         </t>
 
-        <t>If an attacker successfully mounts an injection attack on a TCP connection encapsulating IPsec traffic, 
-        and a Length field in the TCP stream is changed as a result of this attack, then the receiver 
-        in most cases will not be able to correctly identify the boundaries of the following packets in the stream,
-        because it will try to parse an arbitrary data (the result of encryption) as ESP (or IKE) header.
-        This will fail and for this reason all the following packets will be dropped. Eventually the situation should self-recover, but it may 
-        take several minutes and may result in IKE SA deletion and re-creation.
+        <t>If an attacker successfully mounts an injection attack on a TCP connection used for encapsulating IPsec traffic 
+        and modifies a Length field, the receiver might not be able to correctly identify the boundaries of the following packets in the stream
+        since it will try to parse arbitrary data as an ESP or IKE header.
+        After such a parsing failure, all following packets will be dropped. Communication will recover once a new connection is made, but this might
+        take several minutes and can result in IKE SA deletion and re-creation.
         </t>
 
         <t>To speed up the recovery from such attacks, implementations are advised to follow recommendations in <xref target="establish" /> and close 
