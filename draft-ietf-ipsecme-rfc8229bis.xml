@@ -1090,7 +1090,7 @@
         for a 64-bit binary vector consisting of a known SPI in the first 32 bits and a valid Sequence Number for this SPI in the
         second 32 bits, and then validate the ICV of this packet candidate by taking the preceding 16 bits as the Length field.
         They can also search for 4 bytes of zero (non-ESP marker) followed by 128 bits of IKE SPIs of IKE SA associated with this TCP connection
-        and try to validate ICV of this IKE message candidate taking the 16 bits preceding the non-ESP marker as the Length field.
+        and then validate ICV of this IKE message candidate by taking the 16 bits preceding the non-ESP marker as the Length field.
 <!--        Implementations may try to optimize the search process by looking only at the beginning of received TCP segments 
         (in case they are tightly coupled with the TCP/IP stack and know where TCP segment boundaries are). 
         (It was Joe's idea, I'm not sure we need to mention it here) -->
