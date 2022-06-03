@@ -1091,9 +1091,6 @@
         second 32 bits, and then validate the ICV of this packet candidate by taking the preceding 16 bits as the Length field.
         They can also search for 4 bytes of zero (non-ESP marker) followed by 128 bits of IKE SPIs of IKE SA associated with this TCP connection
         and then validate ICV of this IKE message candidate by taking the 16 bits preceding the non-ESP marker as the Length field.
-<!--        Implementations may try to optimize the search process by looking only at the beginning of received TCP segments 
-        (in case they are tightly coupled with the TCP/IP stack and know where TCP segment boundaries are). 
-        (It was Joe's idea, I'm not sure we need to mention it here) -->
         Implementations SHOULD limit the attempts to resync, since if the injection attack is ongoing 
         then there is a high probability that the resync process will not succeed, or quickly
         come under attack again.
