@@ -1081,7 +1081,7 @@
         take several minutes and may result in IKE SA deletion and re-creation.
         </t>
 
-        <t>To speed up the recovery implementations are advised to follow recommendations in <xref target="establish" /> and to close 
+        <t>To speed up the recovery from such attacks, implementations are advised to follow recommendations in <xref target="establish" /> and close 
         the TCP connection in case incoming packets contain SPIs which don't match to any of the SAs they have.
         Once the TCP connection is closed it will be re-created by TCP Originator as described in <xref target="establish" />.
         </t>
