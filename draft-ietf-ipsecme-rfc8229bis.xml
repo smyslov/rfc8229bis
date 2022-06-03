@@ -1068,8 +1068,8 @@
         <xref target="RFC5961" /> discusses how TCP injection attacks can be mitigated.
         </t>
 
-        <t>Note, that data injection attacks are also possible on IP level (e.g. when IP fragmentation is used)
-        resulting in DoS attack even if TCP encapsulation is not used. On the other hand, TCP injection attacks are easier to mount 
+        <t>Note that data injection attacks are also possible on IP level (e.g. when IP fragmentation is used),
+        resulting in DoS attacks even if TCP encapsulation is not used. On the other hand, TCP injection attacks are easier to mount 
         than the IP fragmentation injection attacks, because TCP keeps a long receive window open that’s a sitting target for such attacks. 
         </t>
 
