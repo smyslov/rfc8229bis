@@ -1076,7 +1076,7 @@
         <t>If an attacker successfully mounts an injection attack on a TCP connection used for encapsulating IPsec traffic 
         and modifies a Length field, the receiver might not be able to correctly identify the boundaries of the following packets in the stream
         since it will try to parse arbitrary data as an ESP or IKE header.
-        After such a parsing failure, all following packets will be dropped. Communication will recover once a new connection is made, but this might
+        After such a parsing failure, all following packets will be dropped. Communication will eventually recover, but this might
         take several minutes and can result in IKE SA deletion and re-creation.
         </t>
 
@@ -1085,7 +1085,7 @@
         Once the TCP connection is closed it will be re-created by TCP Originator as described in <xref target="establish" />.
         </t>
 
-        <t>Alternatively, implementations MAY try to re-sync after they receive an unknown SPI by searching the TCP stream
+        <t>Alternatively, implementations MAY try to re-sync after they receive unknown SPIs by searching the TCP stream
         for a 64-bit binary vector consisting of a known SPI in the first 32 bits and a valid Sequence Number for this SPI in the
         second 32 bits, and then validate the ICV of this packet candidate by taking the preceding 16 bits as the Length field.
         They can also search for 4 bytes of zero (non-ESP marker) followed by 128 bits of IKE SPIs of IKE SA associated with this TCP connection
