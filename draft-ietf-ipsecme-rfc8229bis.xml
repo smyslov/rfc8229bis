@@ -1095,7 +1095,8 @@
         (in case they are tightly coupled with the TCP/IP stack and know where TCP segment boundaries are). 
         (It was Joe's idea, I'm not sure we need to mention it here) -->
         Implementations SHOULD limit the attempts to resync, since if the injection attack is ongoing 
-        then there is a high probability that the resync process will never succeed.
+        then there is a high probability that the resync process will not succeed, or quickly
+        come under attack again.
         </t>
 
         <t>An attacker capable of blocking UDP traffic can force peers to use TCP encapsulation,
