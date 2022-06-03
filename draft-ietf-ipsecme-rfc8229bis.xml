@@ -1082,7 +1082,7 @@
         </t>
 
         <t>To speed up the recovery from such attacks, implementations are advised to follow recommendations in <xref target="establish" /> and close 
-        the TCP connection in case incoming packets contain SPIs which don't match to any of the SAs they have.
+        the TCP connection if incoming packets contain SPIs that don't match any known SAs.
         Once the TCP connection is closed it will be re-created by TCP Originator as described in <xref target="establish" />.
         </t>
 
