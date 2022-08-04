@@ -1086,7 +1086,8 @@
         Once the TCP connection is closed it will be re-created by TCP Originator as described in <xref target="establish" />.
         </t>
 
-        <t>Alternatively, implementations MAY try to re-sync after they receive unknown SPIs by searching the TCP stream
+        <t>To avoid performance degradation caused by closing and re-creating TCP connection, 
+	implementations MAY alternatively try to re-sync after they receive unknown SPIs by searching the TCP stream
         for a 64-bit binary vector consisting of a known SPI in the first 32 bits and a valid Sequence Number for this SPI in the
         second 32 bits, and then validate the ICV of this packet candidate by taking the preceding 16 bits as the Length field.
         They can also search for 4 bytes of zero (non-ESP marker) followed by 128 bits of IKE SPIs of IKE SA associated with this TCP connection
