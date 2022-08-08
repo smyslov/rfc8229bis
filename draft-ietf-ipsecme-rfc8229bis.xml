@@ -223,7 +223,7 @@
         Instead, support for TCP encapsulation must be pre-configured on both
         the TCP Originator and the TCP Responder.</t>
 
-        <t>Implementations MUST support TCP encapsulation on TCP port 4500,
+        <t>Compliant implementations MUST support TCP encapsulation on TCP port 4500,
         which is reserved for IPsec NAT traversal.</t>
 
         <t>Beyond a flag indicating support for TCP encapsulation, the
