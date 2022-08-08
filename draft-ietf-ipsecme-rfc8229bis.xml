@@ -315,7 +315,7 @@
             <t>Length (2 octets, unsigned integer) - Length of the IKE packet,
             including the Length field and non-ESP marker. The value in the Length
 			field MUST NOT be 0 or 1. The receiver MUST treat these values as
-			fatal errors and MUST close TCP connection.
+			fatal errors and MUST close the TCP connection.
             </t>
 
 	      </list>
@@ -643,7 +643,7 @@
         <section title="Error Handling in IKE_SA_INIT" anchor="errors" >
           <t>Section 2.21.1 of <xref target="RFC7296" /> describes how error notifications
 		  are handled in the IKE_SA_INIT exchange.  In particular, it is advised
-          that the Initiator should not act immediately after receiving error
+          that the Initiator should not act immediately after receiving an error
           notification and should instead wait some time for valid response,
           since the IKE_SA_INIT messages are completely unauthenticated.  This
           advice does not apply equally in case of TCP encapsulation.  If the
@@ -720,7 +720,7 @@
             <t>Section 8.1 of <xref target="RFC4301"/> requires all tunnel mode IPsec SAs to
             be able to copy the Don't Fragment (DF) bit from inner IP header to
             the outer (tunnel) one.  With TCP encapsulation this is generally
-            not possible, because the TCP/IP stack manages DF bit in the outer IP
+            not possible, because the TCP/IP stack manages the DF bit in the outer IP
             header, and usually the stack ensures that the DF bit is set for TCP
             packets to avoid IP fragmentation. Note, that this behavior is 
             compliant with generic tunneling considerations, since the outer TCP header acts
@@ -980,7 +980,7 @@
           rate at which it reduces its window size.
           </t>
 
-          <t>Note that any negative effects will be shared between all flows going
+          <t>Note that any negative effects will be shared among all flows going
           through the outer TCP connection.  This is of particular concern for
           any latency-sensitive or real-time applications using the tunnel.  If
           such traffic is using a TCP-encapsulated IPsec connection, it is
@@ -1099,7 +1099,7 @@
 
         <t>An attacker capable of blocking UDP traffic can force peers to use TCP encapsulation,
         thus degrading the performance and making the connection more vulnerable to DoS attacks.
-        Note, that attacker capable to modify packets on the wire or to block them can
+        Note that an attacker able to modify packets on the wire or to block them can
         prevent peers to communicate regardless of the transport being used.
         </t>
         
