@@ -264,8 +264,8 @@
         </t>
   
         <t>Although a TCP stream may be able to send very long messages,
-        implementations SHOULD limit message lengths to typical UDP datagram
-        ESP payload lengths. The maximum message length is used as the effective MTU 
+        implementations SHOULD limit message lengths as if UDP encapsulation of ESP is used. 
+	The maximum message length is used as the effective MTU 
         for connections that are being encrypted using ESP, 
         so the maximum message length will influence characteristics of these
         connections, such as the TCP Maximum Segment Size (MSS).
@@ -467,9 +467,11 @@
           their SAs for the standard lifetime or timeout period.  The TCP
           Originator is responsible for re-establishing the TCP connection if
           it is torn down for any unexpected reason.  Since new TCP connections
-          may use different ports due to NAT mappings or local port allocations
+          may use different IP addresses and/or ports due to NAT mappings or local IP or port allocations
           changing, the TCP Responder MUST allow packets for existing SAs to be
-          received from new source ports.
+          received from new source IP addresses and ports. Note that the 
+	  IPv6 Flow-ID header MUST remain constant when new TCP connection is created to avoid ECMP load balancing.
+
           </t>
 
           <t>A peer MUST discard a partially received message due to a broken
