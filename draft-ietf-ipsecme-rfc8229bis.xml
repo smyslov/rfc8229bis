@@ -73,10 +73,10 @@
         all UDP traffic, including IKE and IPsec, but allow TCP connections
         through because they appear to be web traffic.  Devices on these
         networks that need to use IPsec (to access private enterprise
-        networks, to route Voice over IP calls to carrier networks, or
-        because of security policies) are unable to establish IPsec SAs.
+        networks, to route Voice over IP calls to carrier networks, 
+        because of security policies, etc.) are unable to establish IPsec SAs.
         This document defines a method for encapsulating IKE control messages
-        as well as IPsec data messages within a TCP connection.
+        as well as ESP data messages within a TCP connection. Note that AH is not supported by this specification.
         </t>
 
         <t> Using TCP as a transport for IPsec packets adds a third option to the
@@ -94,7 +94,7 @@
           Initiator and the Responder, then subsequent IKE packets are sent
           over UDP port 4500 with four bytes of zero at the start of the
           UDP payload, and ESP packets are sent out over UDP port 4500.
-          Some peers default to using UDP encapsulation even when no NAT is
+          Some implementations default to using UDP encapsulation even when no NAT is
           detected on the path, as some middleboxes do not support IP
           protocols other than TCP and UDP.</t>
 
@@ -317,7 +317,8 @@
 			field MUST NOT be 0 or 1. The receiver MUST treat these values as
 			fatal errors and MUST close the TCP connection.
             </t>
-
+            <t>Non-ESP Marker (4 octets) - Four zero-valued bytes.
+            </t>
 	      </list>
           </t>
 
@@ -684,7 +685,9 @@
           supports NAT traversal. However, for the transport mode IPsec SAs, implementations 
           need to handle TCP and UDP packet checksum fixup during decapsulation, 
           as defined for UDP encapsulation in <xref target="RFC3948"/>.
-          Implementations MAY use the information that
+          </t>
+
+          <t>Implementations MAY use the information that
           a NAT is present to influence keep-alive timer values.
           </t>
 
@@ -718,9 +721,9 @@
           <t>Using TCP encapsulation affects some aspects of IPsec SA processing.
           <list style="numbers" >
             <t>Section 8.1 of <xref target="RFC4301"/> requires all tunnel mode IPsec SAs to
-            be able to copy the Don't Fragment (DF) bit from inner IP header to
+            be able to copy the Don't Fragment (DF) bit from inner IPv4 header to
             the outer (tunnel) one.  With TCP encapsulation this is generally
-            not possible, because the TCP/IP stack manages the DF bit in the outer IP
+            not possible, because the TCP/IP stack manages the DF bit in the outer IPv4
             header, and usually the stack ensures that the DF bit is set for TCP
             packets to avoid IP fragmentation. Note, that this behavior is 
             compliant with generic tunneling considerations, since the outer TCP header acts
