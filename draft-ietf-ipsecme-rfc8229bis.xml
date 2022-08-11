@@ -962,7 +962,8 @@ Length|ESP packet ->
         </t>
 	      
         <t>Operators that intentionally block IPsec because of security implications 
-        may want to also block TCP port 4500 or use DLP to filter out TCP connections started with IKETCP stream prefix.
+        might want to also block TCP port 4500 or use other methods to filter out TCP connections
+        that begin with the "IKETCP" stream prefix.
         </t>
       </section>
 
