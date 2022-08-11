@@ -486,7 +486,7 @@ Length|ESP packet ->
           their SAs for the standard lifetime or timeout period.  The TCP
           Originator is responsible for re-establishing the TCP connection if
           it is torn down for any unexpected reason.  Since new TCP connections
-          may use different IP addresses and/or ports due to NAT mappings or local IP or port allocations
+          may use different IP addresses and/or ports due to NAT mappings or local address or port allocations
           changing, the TCP Responder MUST allow packets for existing SAs to be
           received from new source IP addresses and ports. Note that the 
 	  IPv6 Flow-ID header MUST remain constant when new TCP connection is created to avoid ECMP load balancing.
