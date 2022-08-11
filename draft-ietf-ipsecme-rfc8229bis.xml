@@ -460,7 +460,7 @@ Length|ESP packet ->
       <section title="Using TCP Encapsulation" anchor="tcp-encap">
         <section title="Connection Establishment and Teardown" anchor="establish">
           <t>When the IKE Initiator uses TCP encapsulation, it will initiate a TCP
-          connection to the Responder using the preconfigured Responder's TCP port.  The first
+          connection to the Responder using the Responder's preconfigured TCP port.  The first
           bytes sent on the TCP stream MUST be the stream prefix value (<xref target="prefix"/>).
           After this prefix, encapsulated IKE messages will negotiate the IKE
           SA and initial Child SA <xref target="RFC7296"/>.  After this point, both
