@@ -264,7 +264,8 @@
         </t>
   
         <t>Although a TCP stream may be able to send very long messages,
-        implementations SHOULD limit message lengths as if UDP encapsulation of ESP is used. 
+        implementations SHOULD limit message lengths to match the lengths
+        used for UDP encapsulation of ESP messages. 
 	The maximum message length is used as the effective MTU 
         for connections that are being encrypted using ESP, 
         so the maximum message length will influence characteristics of these
