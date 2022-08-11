@@ -961,7 +961,7 @@ Length|ESP packet ->
         middleboxes.
         </t>
 	      
-        <t>Operators who intentionally block IPsec because of security implications 
+        <t>Operators that intentionally block IPsec because of security implications 
         may want to also block TCP port 4500 or use DLP to filter out TCP connections started with IKETCP stream prefix.
         </t>
       </section>
