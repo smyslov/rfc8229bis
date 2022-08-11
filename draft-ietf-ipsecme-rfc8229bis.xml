@@ -279,7 +279,7 @@
 		</t>
 
         <t>The minimum size of an encapsulated message is 1 octet 
-        (for NAT keep-alive packets, see <xref target="dpd-nat-ka" />). Empty messages 
+        (for NAT-keepalive packets, see <xref target="dpd-nat-ka" />). Empty messages 
         (where the Length field equals to 2) MUST be silently ignored by receiver. 
         </t>
   
@@ -710,22 +710,22 @@ Length|ESP packet ->
           </t>
 
           <t>Implementations MAY use the information that
-          a NAT is present to influence keep-alive timer values.
+          a NAT is present to influence keepalive timer values.
           </t>
 
         </section>
 
-        <section title="NAT Keep-Alives Packets" anchor="nat-ka">
+        <section title="NAT-keepalive Packets" anchor="nat-ka">
          <t>Encapsulating IKE and IPsec inside of a TCP connection can impact the
          strategy that implementations use to 
          maintain middlebox port mappings.
          </t>
 
          <t>In general, TCP port mappings are maintained by NATs longer than UDP
-          port mappings, so IPsec ESP NAT keep-alives <xref target="RFC3948"/> SHOULD NOT be
+          port mappings, so IPsec ESP NAT-keepalive packets <xref target="RFC3948"/> SHOULD NOT be
           sent when using TCP encapsulation.  Any implementation using TCP
-          encapsulation MUST silently drop incoming NAT keep-alive packets
-          and not treat them as errors.  NAT keep-alive packets over a
+          encapsulation MUST silently drop incoming NAT-keepalive packets
+          and not treat them as errors.  NAT-keepalive packets over a
           TCP-encapsulated IPsec connection will be sent as a one-octet-long payload
           with the value 0xFF, preceded by the two byte Length specifying a length
           of 3 (since it includes the length of the Length field).
