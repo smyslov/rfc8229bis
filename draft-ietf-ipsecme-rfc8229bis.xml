@@ -1008,14 +1008,15 @@ Length|ESP packet ->
           sending rate than the outer TCP would allow for.
           </t>
 
-          <t> TCP-in-TCP can also lead to “TCP meltdown”, where stacked instances 
-          of TCP can result in significant impacts to performance <xref target="TCP-MELTDOWN" />.
-          For the case in this document, such meltdown can occur when the window 
-          size of the outer TCP connection is smaller than the window sizes of the inner TCP
-          connections.  The resulting interactions can lead to packets backing up in the outer TCP
-          connection's send buffers.  In order to limit this effect, the outer
-          TCP connection should have limits on its send buffer size and on the
-          rate at which it reduces its window size.
+          <t> TCP-in-TCP can also lead to "TCP meltdown", where stacked instances
+          of TCP can result in significant impacts to performance
+          <xref target="TCP-MELTDOWN" />. This can occur when losses in the lower TCP (closer to the link)
+          Increase delays seen by the higher TCP (closer to the application) that create
+          timeouts, which in turn cause retransmissions that can then cause losses in 
+          the lower TCP by overrunning its buffer. The very mechanism intended to avoid loss
+          (retransmission) interacts between the two layers to increase loss. To limit this effect,
+          the timeouts of the two TCP layers need to be carefully managed, e.g., such that
+          the higher layer has a much longer timeout than the lower layer.
           </t>
 
           <t>Note that any negative effects will be shared among all flows going
