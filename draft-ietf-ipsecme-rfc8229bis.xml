@@ -1013,7 +1013,7 @@ Length|ESP packet ->
           <t> TCP-in-TCP can also lead to "TCP meltdown", where stacked instances
           of TCP can result in significant impacts to performance
           <xref target="TCP-MELTDOWN" />. This can occur when losses in the lower TCP (closer to the link)
-          Increase delays seen by the higher TCP (closer to the application) that create
+          increase delays seen by the higher TCP (closer to the application) that create
           timeouts, which in turn cause retransmissions that can then cause losses in 
           the lower TCP by overrunning its buffer. The very mechanism intended to avoid loss
           (retransmission) interacts between the two layers to increase loss. To limit this effect,
