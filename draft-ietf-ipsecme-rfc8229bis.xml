@@ -2,7 +2,7 @@
 
 <!DOCTYPE rfc SYSTEM "rfc2629.dtd">
 
-<rfc category="std" ipr="trust200902" docName="draft-ietf-ipsecme-rfc8229bis-07" obsoletes="8229">
+<rfc category="std" ipr="trust200902" docName="draft-ietf-ipsecme-rfc8229bis-08" obsoletes="8229">
 
 <?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
 
@@ -73,10 +73,10 @@
         all UDP traffic, including IKE and IPsec, but allow TCP connections
         through because they appear to be web traffic.  Devices on these
         networks that need to use IPsec (to access private enterprise
-        networks, to route Voice over IP calls to carrier networks, or
-        because of security policies) are unable to establish IPsec SAs.
+        networks, to route Voice over IP calls to carrier networks, 
+        because of security policies, etc.) are unable to establish IPsec SAs.
         This document defines a method for encapsulating IKE control messages
-        as well as IPsec data messages within a TCP connection.
+        as well as ESP data messages within a TCP connection. Note that AH is not supported by this specification.
         </t>
 
         <t> Using TCP as a transport for IPsec packets adds a third option to the
@@ -94,7 +94,7 @@
           Initiator and the Responder, then subsequent IKE packets are sent
           over UDP port 4500 with four bytes of zero at the start of the
           UDP payload, and ESP packets are sent out over UDP port 4500.
-          Some peers default to using UDP encapsulation even when no NAT is
+          Some implementations default to using UDP encapsulation even when no NAT is
           detected on the path, as some middleboxes do not support IP
           protocols other than TCP and UDP.</t>
 
@@ -184,6 +184,7 @@
             <t>The interaction of TCP encapsulation with MOBIKE is clarified (<xref target="mobike" />)</t>
             <t>The recommendation for TLS encapsulation (<xref target="tls" />) now includes TLS 1.3</t>
             <t>Examples of TLS encapsulation are provided using TLS 1.3 (<xref target="tls-example" />)</t>
+	     <t>More security considerations are added.</t>
           </list>
           </t>
 
@@ -222,7 +223,7 @@
         Instead, support for TCP encapsulation must be pre-configured on both
         the TCP Originator and the TCP Responder.</t>
 
-        <t>Implementations MUST support TCP encapsulation on TCP port 4500,
+        <t>Compliant implementations MUST support TCP encapsulation on TCP port 4500,
         which is reserved for IPsec NAT traversal.</t>
 
         <t>Beyond a flag indicating support for TCP encapsulation, the
@@ -249,7 +250,7 @@
 
       </section>
 
-      <section title="TCP-Encapsulated Header Formats" anchor="format">
+      <section title="TCP-Encapsulated Data Formats" anchor="format">
         <t>Like UDP encapsulation, TCP encapsulation uses the first four bytes
         of a message to differentiate IKE and ESP messages.  TCP
         encapsulation also adds a 16-bit Length field that precedes every message
@@ -263,8 +264,9 @@
         </t>
   
         <t>Although a TCP stream may be able to send very long messages,
-        implementations SHOULD limit message lengths to typical UDP datagram
-        ESP payload lengths. The maximum message length is used as the effective MTU 
+        implementations SHOULD limit message lengths to match the lengths
+        used for UDP encapsulation of ESP messages. 
+	The maximum message length is used as the effective MTU 
         for connections that are being encrypted using ESP, 
         so the maximum message length will influence characteristics of these
         connections, such as the TCP Maximum Segment Size (MSS).
@@ -277,7 +279,7 @@
 		</t>
 
         <t>The minimum size of an encapsulated message is 1 octet 
-        (for NAT keep-alive packets, see <xref target="dpd-nat-ka" />). Empty messages 
+        (for NAT-keepalive packets, see <xref target="nat-ka" />). Empty messages 
         (where the Length field equals to 2) MUST be silently ignored by receiver. 
         </t>
   
@@ -286,8 +288,8 @@
         abstraction, beyond TCP.
         </t>
 
-        <section title="TCP-Encapsulated IKE Header Format" anchor="format-ike">
-          <figure title="IKE header format for TCP encapsulation" anchor="f-format-ike"><artwork><![CDATA[
+        <section title="TCP-Encapsulated IKE Message Format" anchor="format-ike">
+          <figure title="IKE message format for TCP encapsulation" anchor="f-format-ike"><artwork><![CDATA[
                      1                   2                   3
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
                                 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -296,13 +298,13 @@
 |                         Non-ESP Marker                        |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |                                                               |
-~                      IKE header [RFC7296]                     ~
+~                     IKE message [RFC7296]                     ~
 |                                                               |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
           ]]></artwork>
           </figure>
 
-          <t> The IKE header is preceded by a 16-bit Length field in network byte
+          <t> The IKE message is preceded by a 16-bit Length field in network byte
           order that specifies the length of the IKE message (including the
           non-ESP marker) within the TCP stream.  As with IKE over UDP
           port 4500, a zeroed 32-bit non-ESP marker is inserted before the
@@ -311,32 +313,33 @@
           </t>
 
           <t><list style="symbols">
-            <t>Length (2 octets, unsigned integer) - Length of the IKE packet,
+            <t>Length (2 octets, unsigned integer) - Length of the IKE message,
             including the Length field and non-ESP marker. The value in the Length
 			field MUST NOT be 0 or 1. The receiver MUST treat these values as
-			fatal errors and MUST close TCP connection.
+			fatal errors and MUST close the TCP connection.
             </t>
-
+            <t>Non-ESP Marker (4 octets) - Four zero-valued bytes.
+            </t>
 	      </list>
           </t>
 
         </section>
 
-        <section title="TCP-Encapsulated ESP Header Format" anchor="format-esp">
-          <figure title="ESP header format for TCP encapsulation" anchor="f-format-esp"><artwork><![CDATA[
+        <section title="TCP-Encapsulated ESP Packet Format" anchor="format-esp">
+          <figure title="ESP packet format for TCP encapsulation" anchor="f-format-esp"><artwork><![CDATA[
                      1                   2                   3
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
                                 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
                                 |            Length             |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |                                                               |
-~                     ESP header [RFC4303]                      ~
+~                     ESP packet [RFC4303]                      ~
 |                                                               |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
             ]]></artwork>
           </figure>
 
-          <t>The ESP header is preceded by a 16-bit Length field in network byte
+          <t>The ESP packet is preceded by a 16-bit Length field in network byte
           order that specifies the length of the ESP packet within the TCP
           stream.</t>
 
@@ -358,14 +361,41 @@
 	  <section title="TCP-Encapsulated Stream Prefix" anchor="prefix">
         <t>Each stream of bytes used for IKE and IPsec encapsulation MUST begin
         with a fixed sequence of six bytes as a magic value, containing the
-        characters "IKETCP" as ASCII values.  This value is intended to
+        characters "IKETCP" as ASCII values.
+        </t>
+		  
+        <figure title="TCP-Encapsulated Stream Prefix" anchor="f-prefix"><artwork><![CDATA[
+   0      1      2      3      4      5
++------+------+------+------+------+------+
+| 0x49 | 0x4b | 0x45 | 0x54 | 0x43 | 0x50 |
++------+------+------+------+------+------+
+         ]]></artwork>
+        </figure>
+
+        <t>This value is intended to
         identify and validate that the TCP connection is being used for TCP
         encapsulation as defined in this document, to avoid conflicts with
         the prevalence of previous non-standard protocols that used TCP
         port 4500.  This value is only sent once, by the TCP Originator only,
-        at the beginning of any stream of IKE and ESP messages.
+        at the beginning of the TCP stream of IKE and ESP messages.
         </t>
         
+        <figure><artwork><![CDATA[
+Initiator                                                   Responder
+---------------------------------------------------------------------
+          <new TCP connection is established by Initiator>
+
+Stream Prefix|Length|non-ESP marker|IKE message -->
+                                <-- Length|non-ESP marker|IKE message
+Length|non-ESP marker|IKE message -->
+                                <-- Length|non-ESP marker|IKE message
+
+                                [...]
+Length|ESP packet ->
+                                                 <- Length|ESP packet
+         ]]></artwork>
+        </figure>
+
         <t>If other framing protocols are used within TCP to further encapsulate
         or encrypt the stream of IKE and ESP messages, the stream prefix must
         be at the start of the TCP Originator's IKE and ESP message stream
@@ -375,23 +405,16 @@
         as possible and not rely on other framing protocols on top of TCP.
         </t>
 
-        <figure title="TCP-Encapsulated Stream Prefix" anchor="f-prefix"><artwork><![CDATA[
-             0      1      2      3      4      5
-            +------+------+------+------+------+------+
-            | 0x49 | 0x4b | 0x45 | 0x54 | 0x43 | 0x50 |
-            +------+------+------+------+------+------+
-         ]]></artwork>
-        </figure>
       </section>
 
       <section title="Applicability" anchor="applicability">
         <t>TCP encapsulation is applicable only when it has been configured to
-        be used with specific IKE peers.  If a Responder is configured to use
+        be used with specific IKE peers.  If a Responder is configured to accept and use
         TCP encapsulation, it MUST listen on the configured port(s) in case
         any peers will initiate new IKE sessions.  Initiators MAY use TCP
         encapsulation for any IKE session to a peer that is configured to
         support TCP encapsulation, although it is recommended that Initiators
-        should only use TCP encapsulation when traffic over UDP is blocked.
+        only use TCP encapsulation when traffic over UDP is blocked.
         </t>
         
         <t>Since the support of TCP encapsulation is a configured property, not
@@ -403,7 +426,7 @@
         </t>
         
         <t>If TCP encapsulation is being used for a specific IKE SA, all
-        messages for that IKE SA and its Child SAs MUST be sent over a TCP
+        IKE messages for that IKE SA and ESP packets for its Child SAs MUST be sent over a TCP
         connection until the SA is deleted or IKEv2 Mobility and Multihoming
         (MOBIKE) is used to change the SA endpoints and/or the encapsulation
         protocol.  See <xref target="mobike"/> for more details on using MOBIKE to
@@ -439,8 +462,8 @@
       <section title="Using TCP Encapsulation" anchor="tcp-encap">
         <section title="Connection Establishment and Teardown" anchor="establish">
           <t>When the IKE Initiator uses TCP encapsulation, it will initiate a TCP
-          connection to the Responder using the configured TCP port.  The first
-          bytes sent on the stream MUST be the stream prefix value (<xref target="prefix"/>).
+          connection to the Responder using the Responder's preconfigured TCP port.  The first
+          bytes sent on the TCP stream MUST be the stream prefix value (<xref target="prefix"/>).
           After this prefix, encapsulated IKE messages will negotiate the IKE
           SA and initial Child SA <xref target="RFC7296"/>.  After this point, both
           encapsulated IKE (<xref target="f-format-ike" />) and ESP (<xref target="f-format-esp" />)
@@ -465,9 +488,11 @@
           their SAs for the standard lifetime or timeout period.  The TCP
           Originator is responsible for re-establishing the TCP connection if
           it is torn down for any unexpected reason.  Since new TCP connections
-          may use different ports due to NAT mappings or local port allocations
+          may use different IP addresses and/or ports due to NAT mappings or local address or port allocations
           changing, the TCP Responder MUST allow packets for existing SAs to be
-          received from new source ports.
+          received from new source IP addresses and ports. Note that the 
+	  IPv6 Flow-ID header MUST remain constant when new TCP connection is created to avoid ECMP load balancing.
+
           </t>
 
           <t>A peer MUST discard a partially received message due to a broken
@@ -480,7 +505,12 @@
           TCP connection.
           </t>
 
-          <t>If a TCP connection is being used to resume a previous IKE session,
+          <t>Multiple IKE SAs MUST NOT share a single TCP connection, unless one
+          is a rekey of an existing IKE SA, in which case there will
+          temporarily be two IKE SAs on the same TCP connection.
+          </t>
+		
+          <t>If a TCP connection is being used to continue a previous IKE session,
           the TCP Responder can recognize the session using either the IKE SPI
           from an encapsulated IKE message or the ESP SPI from an encapsulated
           ESP message.  If the session had been fully established previously,
@@ -533,10 +563,6 @@
           messages that has been replaced by a new connection).
           </t>
 
-          <t>Multiple IKE SAs MUST NOT share a single TCP connection, unless one
-          is a rekey of an existing IKE SA, in which case there will
-          temporarily be two IKE SAs on the same TCP connection.
-          </t>
         </section>
 
         <section title="Retransmissions" anchor="retr" >
@@ -597,7 +623,7 @@
             <t>the exchange Responder SHOULD NOT send an IKEv2 Cookie request without an accompanied Puzzle;
 		    implementations might choose to have exceptions to this for cases like mitigating TCP Sequence Number attacks.
             </t>
-            <t>if the Responder chooses to send Cookie request (possibly along
+            <t>if the Responder chooses to send a Cookie request (possibly along
             with Puzzle request), then the TCP connection that the IKE_SA_INIT
             request message was received over SHOULD be closed after the Responder sends its reply
             and no repeated requests are received within some short period of time 
@@ -642,7 +668,7 @@
         <section title="Error Handling in IKE_SA_INIT" anchor="errors" >
           <t>Section 2.21.1 of <xref target="RFC7296" /> describes how error notifications
 		  are handled in the IKE_SA_INIT exchange.  In particular, it is advised
-          that the Initiator should not act immediately after receiving error
+          that the Initiator should not act immediately after receiving an error
           notification and should instead wait some time for valid response,
           since the IKE_SA_INIT messages are completely unauthenticated.  This
           advice does not apply equally in case of TCP encapsulation.  If the
@@ -653,7 +679,7 @@
           </t>
 
           <t>Thus, in case of TCP encapsulation, an Initiator SHOULD NOT wait for
-          additional messages in case it receives error notification from the
+          additional messages in case it receives an error notification from the
           Responder in the IKE_SA_INIT exchange.
           </t>
 
@@ -667,7 +693,7 @@
         </section>
 
         <section title="NAT Detection Payloads" anchor="nat-det">
-          <t>When negotiating over UDP port 500, IKE_SA_INIT packets include
+          <t>When negotiating over UDP, IKE_SA_INIT packets include
           NAT_DETECTION_SOURCE_IP and NAT_DETECTION_DESTINATION_IP payloads to
           determine if UDP encapsulation of IPsec packets should be used.
           These payloads contain SHA-1 digests of the SPIs, IP addresses, and
@@ -683,26 +709,35 @@
           supports NAT traversal. However, for the transport mode IPsec SAs, implementations 
           need to handle TCP and UDP packet checksum fixup during decapsulation, 
           as defined for UDP encapsulation in <xref target="RFC3948"/>.
-          Implementations MAY use the information that
-          a NAT is present to influence keep-alive timer values.
+          </t>
+
+          <t>Implementations MAY use the information that
+          a NAT is present to influence keepalive timer values.
           </t>
 
         </section>
 
-        <section title="Keep-Alives and Dead Peer Detection" anchor="dpd-nat-ka">
-          <t>Encapsulating IKE and IPsec inside of a TCP connection can impact the
-          strategy that implementations use to detect peer liveness and to
-          maintain middlebox port mappings.  Peer liveness should be checked
-          using IKE informational packets <xref target="RFC7296"/>.
+        <section title="NAT-keepalive Packets" anchor="nat-ka">
+         <t>Encapsulating IKE and IPsec inside of a TCP connection can impact the
+         strategy that implementations use to 
+         maintain middlebox port mappings.
+         </t>
+
+         <t>In general, TCP port mappings are maintained by NATs longer than UDP
+          port mappings, so IPsec ESP NAT-keepalive packets <xref target="RFC3948"/> SHOULD NOT be
+          sent when using TCP encapsulation.  Any implementation using TCP
+          encapsulation MUST silently drop incoming NAT-keepalive packets
+          and not treat them as errors.  NAT-keepalive packets over a
+          TCP-encapsulated IPsec connection will be sent as a one-octet-long payload
+          with the value 0xFF, preceded by the two byte Length specifying a length
+          of 3 (since it includes the length of the Length field).
           </t>
 
-          <t>In general, TCP port mappings are maintained by NATs longer than UDP
-          port mappings, so IPsec ESP NAT keep-alives <xref target="RFC3948"/> SHOULD NOT be
-          sent when using TCP encapsulation.  Any implementation using TCP
-          encapsulation MUST silently drop incoming NAT keep-alive packets
-          and not treat them as errors.  NAT keep-alive packets over a
-          TCP-encapsulated IPsec connection will be sent as an ESP message with
-          a one-octet-long payload with the value 0xFF.
+        </section>
+
+	<section title="Dead Peer Detection and Transport Keepalives" anchor="dpd">
+          <t>Peer liveness should be checked
+          using IKE informational packets <xref target="RFC7296"/>.
           </t>
 
           <t>Note that, depending on the configuration of TCP and TLS on the
@@ -717,9 +752,9 @@
           <t>Using TCP encapsulation affects some aspects of IPsec SA processing.
           <list style="numbers" >
             <t>Section 8.1 of <xref target="RFC4301"/> requires all tunnel mode IPsec SAs to
-            be able to copy the Don't Fragment (DF) bit from inner IP header to
+            be able to copy the Don't Fragment (DF) bit from inner IPv4 header to
             the outer (tunnel) one.  With TCP encapsulation this is generally
-            not possible, because the TCP/IP stack manages DF bit in the outer IP
+            not possible, because the TCP/IP stack manages the DF bit in the outer IPv4
             header, and usually the stack ensures that the DF bit is set for TCP
             packets to avoid IP fragmentation. Note, that this behavior is 
             compliant with generic tunneling considerations, since the outer TCP header acts
@@ -922,9 +957,15 @@
         </t>
 
         <t>A network device that monitors the transport layer will track the
-        state of TCP sessions, such as TCP sequence numbers.  TCP
-        encapsulation of IKE should therefore use common TCP behaviors to
-        avoid being dropped by middleboxes.
+        state of TCP sessions, such as TCP sequence numbers.  If the IKE implementation 
+        has its own minimal implementation of TCP,
+        it SHOULD still use common TCP behaviors to avoid being dropped by
+        middleboxes.
+        </t>
+	      
+        <t>Operators that intentionally block IPsec because of security implications 
+        might want to also block TCP port 4500 or use other methods to reject TCP encapsulated IPsec traffic 
+	(e.g. filter out TCP connections that begin with the "IKETCP" stream prefix).
         </t>
       </section>
 
@@ -933,7 +974,7 @@
         negatively impact the performance of connections within a tunnel-mode
         IPsec SA.  Implementations should be aware of these performance
         impacts and take these into consideration when determining when to
-        use TCP encapsulation.  Implementations SHOULD favor using direct ESP
+        use TCP encapsulation.  Implementations MUST favor using direct ESP
         or UDP encapsulation over TCP encapsulation whenever possible.
         </t>
 
@@ -969,17 +1010,18 @@
           sending rate than the outer TCP would allow for.
           </t>
 
-          <t> TCP-in-TCP can also lead to “TCP meltdown”, where stacked instances 
-          of TCP can result in significant impacts to performance <xref target="TCP-MELTDOWN" />.
-          For the case in this document, such meltdown can occur when the window 
-          size of the outer TCP connection is smaller than the window sizes of the inner TCP
-          connections.  The resulting interactions can lead to packets backing up in the outer TCP
-          connection's send buffers.  In order to limit this effect, the outer
-          TCP connection should have limits on its send buffer size and on the
-          rate at which it reduces its window size.
+          <t> TCP-in-TCP can also lead to "TCP meltdown", where stacked instances
+          of TCP can result in significant impacts to performance
+          <xref target="TCP-MELTDOWN" />. This can occur when losses in the lower TCP (closer to the link)
+          increase delays seen by the higher TCP (closer to the application) that create
+          timeouts, which in turn cause retransmissions that can then cause losses in 
+          the lower TCP by overrunning its buffer. The very mechanism intended to avoid loss
+          (retransmission) interacts between the two layers to increase loss. To limit this effect,
+          the timeouts of the two TCP layers need to be carefully managed, e.g., such that
+          the higher layer has a much longer timeout than the lower layer.
           </t>
 
-          <t>Note that any negative effects will be shared between all flows going
+          <t>Note that any negative effects will be shared among all flows going
           through the outer TCP connection.  This is of particular concern for
           any latency-sensitive or real-time applications using the tunnel.  If
           such traffic is using a TCP-encapsulated IPsec connection, it is
@@ -1025,7 +1067,9 @@
           <t>Implementations SHOULD follow the ECN compatibility mode for tunnel
           ingress as described in <xref target="RFC6040"/>.  In compatibility mode, the outer
           tunnel TCP connection marks its packet headers as not ECN-capable.
-          If upon egress, the arriving outer header is marked with CE, the
+          </t>
+
+          <t>If upon egress, the arriving outer header is marked with CE, the
           implementation will drop the inner packet, since there is not a
           distinct inner packet header onto which to translate the ECN
           markings.
@@ -1082,10 +1126,11 @@
 
         <t>To speed up the recovery from such attacks, implementations are advised to follow recommendations in <xref target="establish" /> and close 
         the TCP connection if incoming packets contain SPIs that don't match any known SAs.
-        Once the TCP connection is closed it will be re-created by TCP Originator as described in <xref target="establish" />.
+        Once the TCP connection is closed it will be re-created by the TCP Originator as described in <xref target="establish" />.
         </t>
 
-        <t>Alternatively, implementations MAY try to re-sync after they receive unknown SPIs by searching the TCP stream
+        <t>To avoid performance degradation caused by closing and re-creating TCP connection, 
+	implementations MAY alternatively try to re-sync after they receive unknown SPIs by searching the TCP stream
         for a 64-bit binary vector consisting of a known SPI in the first 32 bits and a valid Sequence Number for this SPI in the
         second 32 bits, and then validate the ICV of this packet candidate by taking the preceding 16 bits as the Length field.
         They can also search for 4 bytes of zero (non-ESP marker) followed by 128 bits of IKE SPIs of IKE SA associated with this TCP connection
@@ -1097,14 +1142,13 @@
 
         <t>An attacker capable of blocking UDP traffic can force peers to use TCP encapsulation,
         thus degrading the performance and making the connection more vulnerable to DoS attacks.
-        Note, that attacker capable to modify packets on the wire or to block them can
+        Note that an attacker able to modify packets on the wire or to block them can
         prevent peers to communicate regardless of the transport being used.
         </t>
         
-        <t>TCP Responders should be careful to ensure that (1) the stream prefix
+        <t>TCP Responders should be careful to ensure that the stream prefix
         "IKETCP" uniquely identifies incoming streams as streams that use the
-        TCP encapsulation protocol and (2) they are not running any other
-        protocols on the same listening port (to avoid potential conflicts).
+        TCP encapsulation protocol.
         </t>
         
         <t>Attackers may be able to disrupt the TCP connection by sending
@@ -1119,7 +1163,7 @@
         
         <t>Similarly to MOBIKE, TCP encapsulation requires a TCP Responder to
         handle changes to source address and port due to network or
-        connection disruption.  The successful delivery of valid IKE or ESP
+        connection disruption.  The successful delivery of valid new IKE or ESP
         messages over a new TCP connection is used by the TCP Responder to
         determine where to send subsequent responses.  If an attacker is able
         to send packets on a new TCP connection that pass the validation
@@ -1250,53 +1294,54 @@
               ----------                          ----------
   1)  --------------------  TCP Connection  -------------------
       (IP_I:Port_I  -> IP_R:Port_R)
-      TcpSyn                    ---------->
-                                <----------          TcpSyn,Ack
-      TcpAck                    ---------->
+      TcpSyn                   ------->
+                               <-------              TcpSyn,Ack
+      TcpAck                   ------->
   2)  ---------------------  TLS Session  ---------------------
-      ClientHello               ---------->
+      ClientHello              ------->
                                                     ServerHello
                                           {EncryptedExtensions}
                                                  {Certificate*}
                                            {CertificateVerify*}
-                                <----------          {Finished}
-      {Finished}                ---------->
+                               <-------              {Finished}
+      {Finished}               ------->
   3)  ---------------------- Stream Prefix --------------------
-      "IKETCP"                  ---------->
+      "IKETCP"                 ------->
   4)  ----------------------- IKE Session ---------------------
-      Length + Non-ESP Marker   ---------->
+      Length + Non-ESP Marker  ------->
       IKE_SA_INIT
       HDR, SAi1, KEi, Ni,
       [N(NAT_DETECTION_SOURCE_IP)],
       [N(NAT_DETECTION_DESTINATION_IP)]
-                                <------ Length + Non-ESP Marker
+                               <------- Length + Non-ESP Marker
                                                     IKE_SA_INIT
                                             HDR, SAr1, KEr, Nr,
                                   [N(NAT_DETECTION_SOURCE_IP)],
                               [N(NAT_DETECTION_DESTINATION_IP)]
-      Length + Non-ESP Marker   ---------->
+      Length + Non-ESP Marker  ------->
       first IKE_AUTH
       HDR, SK {IDi, [CERTREQ]
       CP(CFG_REQUEST), IDr,
       SAi2, TSi, TSr, ...}
-                                <------ Length + Non-ESP Marker
+                               <------- Length + Non-ESP Marker
                                                  first IKE_AUTH
                                     HDR, SK {IDr, [CERT], AUTH,
                                            EAP, SAr2, TSi, TSr}
-      Length + Non-ESP Marker   ---------->
-      IKE_AUTH + EAP
-      repeat 1..N times
-                                <------ Length + Non-ESP Marker
-                                                 IKE_AUTH + EAP
-      Length + Non-ESP Marker   ---------->
+      Length + Non-ESP Marker  ------->
+      IKE_AUTH (repeat 1..N times)
+      HDR, SK {EAP}
+                               <------- Length + Non-ESP Marker
+                                   IKE_AUTH (repeat 1..N times)
+                                                   HDR SK {EAP}
+      Length + Non-ESP Marker  ------->
       final IKE_AUTH
       HDR, SK {AUTH}
-                                <------ Length + Non-ESP Marker
+                               <------- Length + Non-ESP Marker
                                                  final IKE_AUTH
                                   HDR, SK {AUTH, CP(CFG_REPLY),
                                              SA, TSi, TSr, ...}
       -------------- IKE and IPsec SAs Established ------------
-      Length + ESP Frame        ---------->
+      Length + ESP Frame       ------->
         ]]></artwork>
         	</figure>
 
@@ -1326,22 +1371,22 @@
                 Client                              Server
               ----------                          ----------
   1)  ----------------------- IKE Session ---------------------
-      Length + Non-ESP Marker   ---------->
+      Length + Non-ESP Marker  ------->
       INFORMATIONAL
       HDR, SK {[N,] [D,]
              [CP,] ...}
-                                <------ Length + Non-ESP Marker
+                               <------- Length + Non-ESP Marker
                                                   INFORMATIONAL
                                              HDR, SK {[N,] [D,]
                                                      [CP], ...}
   2)  ---------------------  TLS Session  ---------------------
-      close_notify              ---------->
-                                <----------        close_notify
+      close_notify             ------->
+                               <-------            close_notify
   3)  --------------------  TCP Connection  -------------------
-      TcpFin                    ---------->
-                                <----------                 Ack
-                                <----------              TcpFin
-      Ack                       ---------->
+      TcpFin                   ------->
+                               <-------                     Ack
+                               <-------                  TcpFin
+      Ack                      ------->
       --------------------  IKE SA Deleted  -------------------
         ]]></artwork>
         	</figure>
@@ -1367,17 +1412,17 @@
               ----------                          ----------
   1)  --------------------  TCP Connection  -------------------
       (IP_I:Port_I  -> IP_R:Port_R)
-      TcpSyn                    ---------->
-                                <----------          TcpSyn,Ack
-      TcpAck                    ---------->
+      TcpSyn                   ------->
+                               <-------              TcpSyn,Ack
+      TcpAck                   ------->
   2)  ---------------------  TLS Session  ---------------------
-      ClientHello               ---------->
+      ClientHello              ------->
                                                     ServerHello
                                           {EncryptedExtensions}
-                                <----------          {Finished}
-      {Finished}                ---------->
+                               <-------              {Finished}
+      {Finished}               ------->
   3)  ---------------------- Stream Prefix --------------------
-      "IKETCP"                  ---------->
+      "IKETCP"                 ------->
   4)  <---------------------> IKE/ESP Flow <------------------>
         ]]></artwork>
         	</figure>
@@ -1409,66 +1454,75 @@
             <figure><artwork><![CDATA[
                   Client                              Server
                 ----------                          ----------
+  1)  --------------------- IKE_session ----------------------
       (IP_I1:UDP500 -> IP_R:UDP500)
-  1)  ----------------- IKE_SA_INIT Exchange -----------------
+      IKE_SA_INIT              ------->
+      HDR, SAi1, KEi, Ni,
+      [N(NAT_DETECTION_SOURCE_IP)],
+      [N(NAT_DETECTION_DESTINATION_IP)]
+                               <-------            IKE_SA_INIT
+                                            HDR, SAr1, KEr, Nr,
+                                  [N(NAT_DETECTION_SOURCE_IP)],
+                              [N(NAT_DETECTION_DESTINATION_IP)]
       (IP_I1:UDP4500 -> IP_R:UDP4500)
-      Non-ESP Marker           ----------->
-      Initial IKE_AUTH
+      Non-ESP Marker           ------->
+      IKE_AUTH
       HDR, SK { IDi, CERT, AUTH,
-      CP(CFG_REQUEST),
       SAi2, TSi, TSr,
       N(MOBIKE_SUPPORTED) }
-                               <-----------      Non-ESP Marker
-                                               Initial IKE_AUTH
+                               <-------          Non-ESP Marker
+                                                       IKE_AUTH
                                      HDR, SK { IDr, CERT, AUTH,
-                                           EAP, SAr2, TSi, TSr,
+                                                SAr2, TSi, TSr,
                                           N(MOBIKE_SUPPORTED) }
-      <------------------ IKE SA Establishment --------------->
+      <---------------------> IKE/ESP Flow <------------------>
   2)  ------------ MOBIKE Attempt on New Network --------------
       (IP_I2:UDP4500 -> IP_R:UDP4500)
-      Non-ESP Marker           ----------->
+      Non-ESP Marker           ------->
       INFORMATIONAL
       HDR, SK { N(UPDATE_SA_ADDRESSES),
       N(NAT_DETECTION_SOURCE_IP),
       N(NAT_DETECTION_DESTINATION_IP) }
   3)  --------------------  TCP Connection  -------------------
       (IP_I2:Port_I -> IP_R:Port_R)
-      TcpSyn                   ----------->
-                               <-----------          TcpSyn,Ack
-      TcpAck                   ----------->
+      TcpSyn                   ------->
+                               <-------              TcpSyn,Ack
+      TcpAck                   ------->
   4)  ---------------------  TLS Session  ---------------------
-      ClientHello               ---------->
+      ClientHello              ------->
                                                     ServerHello
                                           {EncryptedExtensions}
                                                  {Certificate*}
                                            {CertificateVerify*}
-                                <----------          {Finished}
-      {Finished}                ---------->
+                               <-------              {Finished}
+      {Finished}               ------->
   5)  ---------------------- Stream Prefix --------------------
-      "IKETCP"                  ---------->
+      "IKETCP"                 ------->
   6)  ------------ Retransmit Message from step 2 -------------
-      Length + Non-ESP Marker  ----------->
+      Length + Non-ESP Marker  ------->
       INFORMATIONAL
       HDR, SK { N(UPDATE_SA_ADDRESSES),
       N(NAT_DETECTION_SOURCE_IP),
       N(NAT_DETECTION_DESTINATION_IP) }
                                <------- Length + Non-ESP Marker
+                                                  INFORMATIONAL
                           HDR, SK { N(NAT_DETECTION_SOURCE_IP),
                               N(NAT_DETECTION_DESTINATION_IP) }
   7)  -- New Exchange with recalculated  NAT_DETECTION_*_IP ---
-      Length + Non-ESP Marker  ----------->
+      Length + Non-ESP Marker  ------->
       INFORMATIONAL
       HDR, SK { N(UPDATE_SA_ADDRESSES),
       N(NAT_DETECTION_SOURCE_IP),
       N(NAT_DETECTION_DESTINATION_IP) }
                                <------- Length + Non-ESP Marker
+                                                  INFORMATIONAL
                           HDR, SK { N(NAT_DETECTION_SOURCE_IP),
                               N(NAT_DETECTION_DESTINATION_IP) }
   8)  <---------------------> IKE/ESP Flow <------------------>
         ]]></artwork>
         	</figure>
             <t><list style="numbers">
-              <t>During the IKE_SA_INIT exchange, the client and server exchange
+              <t>During the IKE_AUTH exchange, the client and server exchange
               MOBIKE_SUPPORTED notify payloads to indicate support for MOBIKE.
               </t>
               
@@ -1489,7 +1543,8 @@
               traffic (<xref target="prefix"/>).
               </t>
               
-              <t>The client sends the UPDATE_SA_ADDRESSES notify payload on the
+              <t>The client sends the UPDATE_SA_ADDRESSES notify payload in the 
+              INFORMATIONAL exchange on the
               TCP-encapsulated connection.  Note that this IKE message is the
               same as the one sent over UDP in step 2; it should have the same
               message ID and contents.
