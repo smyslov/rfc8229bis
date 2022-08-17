@@ -279,7 +279,7 @@
 		</t>
 
         <t>The minimum size of an encapsulated message is 1 octet 
-        (for NAT-keepalive packets, see <xref target="dpd-nat-ka" />). Empty messages 
+        (for NAT-keepalive packets, see <xref target="nat-ka" />). Empty messages 
         (where the Length field equals to 2) MUST be silently ignored by receiver. 
         </t>
   
@@ -381,16 +381,18 @@
         </t>
         
         <figure><artwork><![CDATA[
-Initiator                       Responder
+Initiator                                                   Responder
+---------------------------------------------------------------------
+          <new TCP connection is established by Initiator>
 
-<new TCP connection is established by Initiator>
 Stream Prefix|Length|non-ESP marker|IKE message -->
-                            <-- Length|non-ESP marker|IKE message
+                                <-- Length|non-ESP marker|IKE message
 Length|non-ESP marker|IKE message -->
-                            <-- Length|non-ESP marker|IKE message
-              [...]
+                                <-- Length|non-ESP marker|IKE message
+
+                                [...]
 Length|ESP packet ->
-                            <- Length|ESP packet
+                                                 <- Length|ESP packet
          ]]></artwork>
         </figure>
 
@@ -1292,53 +1294,54 @@ Length|ESP packet ->
               ----------                          ----------
   1)  --------------------  TCP Connection  -------------------
       (IP_I:Port_I  -> IP_R:Port_R)
-      TcpSyn                    ---------->
-                                <----------          TcpSyn,Ack
-      TcpAck                    ---------->
+      TcpSyn                   ------->
+                               <-------              TcpSyn,Ack
+      TcpAck                   ------->
   2)  ---------------------  TLS Session  ---------------------
-      ClientHello               ---------->
+      ClientHello              ------->
                                                     ServerHello
                                           {EncryptedExtensions}
                                                  {Certificate*}
                                            {CertificateVerify*}
-                                <----------          {Finished}
-      {Finished}                ---------->
+                               <-------              {Finished}
+      {Finished}               ------->
   3)  ---------------------- Stream Prefix --------------------
-      "IKETCP"                  ---------->
+      "IKETCP"                 ------->
   4)  ----------------------- IKE Session ---------------------
-      Length + Non-ESP Marker   ---------->
+      Length + Non-ESP Marker  ------->
       IKE_SA_INIT
       HDR, SAi1, KEi, Ni,
       [N(NAT_DETECTION_SOURCE_IP)],
       [N(NAT_DETECTION_DESTINATION_IP)]
-                                <------ Length + Non-ESP Marker
+                               <------- Length + Non-ESP Marker
                                                     IKE_SA_INIT
                                             HDR, SAr1, KEr, Nr,
                                   [N(NAT_DETECTION_SOURCE_IP)],
                               [N(NAT_DETECTION_DESTINATION_IP)]
-      Length + Non-ESP Marker   ---------->
+      Length + Non-ESP Marker  ------->
       first IKE_AUTH
       HDR, SK {IDi, [CERTREQ]
       CP(CFG_REQUEST), IDr,
       SAi2, TSi, TSr, ...}
-                                <------ Length + Non-ESP Marker
+                               <------- Length + Non-ESP Marker
                                                  first IKE_AUTH
                                     HDR, SK {IDr, [CERT], AUTH,
                                            EAP, SAr2, TSi, TSr}
-      Length + Non-ESP Marker   ---------->
-      IKE_AUTH + EAP
-      repeat 1..N times
-                                <------ Length + Non-ESP Marker
-                                                 IKE_AUTH + EAP
-      Length + Non-ESP Marker   ---------->
+      Length + Non-ESP Marker  ------->
+      IKE_AUTH (repeat 1..N times)
+      HDR, SK {EAP}
+                               <------- Length + Non-ESP Marker
+                                   IKE_AUTH (repeat 1..N times)
+                                                   HDR SK {EAP}
+      Length + Non-ESP Marker  ------->
       final IKE_AUTH
       HDR, SK {AUTH}
-                                <------ Length + Non-ESP Marker
+                               <------- Length + Non-ESP Marker
                                                  final IKE_AUTH
                                   HDR, SK {AUTH, CP(CFG_REPLY),
                                              SA, TSi, TSr, ...}
       -------------- IKE and IPsec SAs Established ------------
-      Length + ESP Frame        ---------->
+      Length + ESP Frame       ------->
         ]]></artwork>
         	</figure>
 
@@ -1368,22 +1371,22 @@ Length|ESP packet ->
                 Client                              Server
               ----------                          ----------
   1)  ----------------------- IKE Session ---------------------
-      Length + Non-ESP Marker   ---------->
+      Length + Non-ESP Marker  ------->
       INFORMATIONAL
       HDR, SK {[N,] [D,]
              [CP,] ...}
-                                <------ Length + Non-ESP Marker
+                               <------- Length + Non-ESP Marker
                                                   INFORMATIONAL
                                              HDR, SK {[N,] [D,]
                                                      [CP], ...}
   2)  ---------------------  TLS Session  ---------------------
-      close_notify              ---------->
-                                <----------        close_notify
+      close_notify             ------->
+                               <-------            close_notify
   3)  --------------------  TCP Connection  -------------------
-      TcpFin                    ---------->
-                                <----------                 Ack
-                                <----------              TcpFin
-      Ack                       ---------->
+      TcpFin                   ------->
+                               <-------                     Ack
+                               <-------                  TcpFin
+      Ack                      ------->
       --------------------  IKE SA Deleted  -------------------
         ]]></artwork>
         	</figure>
@@ -1409,17 +1412,17 @@ Length|ESP packet ->
               ----------                          ----------
   1)  --------------------  TCP Connection  -------------------
       (IP_I:Port_I  -> IP_R:Port_R)
-      TcpSyn                    ---------->
-                                <----------          TcpSyn,Ack
-      TcpAck                    ---------->
+      TcpSyn                   ------->
+                               <-------              TcpSyn,Ack
+      TcpAck                   ------->
   2)  ---------------------  TLS Session  ---------------------
-      ClientHello               ---------->
+      ClientHello              ------->
                                                     ServerHello
                                           {EncryptedExtensions}
-                                <----------          {Finished}
-      {Finished}                ---------->
+                               <-------              {Finished}
+      {Finished}               ------->
   3)  ---------------------- Stream Prefix --------------------
-      "IKETCP"                  ---------->
+      "IKETCP"                 ------->
   4)  <---------------------> IKE/ESP Flow <------------------>
         ]]></artwork>
         	</figure>
@@ -1453,21 +1456,21 @@ Length|ESP packet ->
                 ----------                          ----------
   1)  --------------------- IKE_session ----------------------
       (IP_I1:UDP500 -> IP_R:UDP500)
-      IKE_SA_INIT              ---------->
+      IKE_SA_INIT              ------->
       HDR, SAi1, KEi, Ni,
       [N(NAT_DETECTION_SOURCE_IP)],
       [N(NAT_DETECTION_DESTINATION_IP)]
-                               <----------          IKE_SA_INIT
+                               <-------            IKE_SA_INIT
                                             HDR, SAr1, KEr, Nr,
                                   [N(NAT_DETECTION_SOURCE_IP)],
                               [N(NAT_DETECTION_DESTINATION_IP)]
       (IP_I1:UDP4500 -> IP_R:UDP4500)
-      Non-ESP Marker           ----------->
+      Non-ESP Marker           ------->
       IKE_AUTH
       HDR, SK { IDi, CERT, AUTH,
       SAi2, TSi, TSr,
       N(MOBIKE_SUPPORTED) }
-                               <-----------      Non-ESP Marker
+                               <-------          Non-ESP Marker
                                                        IKE_AUTH
                                      HDR, SK { IDr, CERT, AUTH,
                                                 SAr2, TSi, TSr,
@@ -1475,28 +1478,28 @@ Length|ESP packet ->
       <---------------------> IKE/ESP Flow <------------------>
   2)  ------------ MOBIKE Attempt on New Network --------------
       (IP_I2:UDP4500 -> IP_R:UDP4500)
-      Non-ESP Marker           ----------->
+      Non-ESP Marker           ------->
       INFORMATIONAL
       HDR, SK { N(UPDATE_SA_ADDRESSES),
       N(NAT_DETECTION_SOURCE_IP),
       N(NAT_DETECTION_DESTINATION_IP) }
   3)  --------------------  TCP Connection  -------------------
       (IP_I2:Port_I -> IP_R:Port_R)
-      TcpSyn                   ----------->
-                               <-----------          TcpSyn,Ack
-      TcpAck                   ----------->
+      TcpSyn                   ------->
+                               <-------              TcpSyn,Ack
+      TcpAck                   ------->
   4)  ---------------------  TLS Session  ---------------------
-      ClientHello               ---------->
+      ClientHello              ------->
                                                     ServerHello
                                           {EncryptedExtensions}
                                                  {Certificate*}
                                            {CertificateVerify*}
-                                <----------          {Finished}
-      {Finished}                ---------->
+                               <-------              {Finished}
+      {Finished}               ------->
   5)  ---------------------- Stream Prefix --------------------
-      "IKETCP"                  ---------->
+      "IKETCP"                 ------->
   6)  ------------ Retransmit Message from step 2 -------------
-      Length + Non-ESP Marker  ----------->
+      Length + Non-ESP Marker  ------->
       INFORMATIONAL
       HDR, SK { N(UPDATE_SA_ADDRESSES),
       N(NAT_DETECTION_SOURCE_IP),
@@ -1506,7 +1509,7 @@ Length|ESP packet ->
                           HDR, SK { N(NAT_DETECTION_SOURCE_IP),
                               N(NAT_DETECTION_DESTINATION_IP) }
   7)  -- New Exchange with recalculated  NAT_DETECTION_*_IP ---
-      Length + Non-ESP Marker  ----------->
+      Length + Non-ESP Marker  ------->
       INFORMATIONAL
       HDR, SK { N(UPDATE_SA_ADDRESSES),
       N(NAT_DETECTION_SOURCE_IP),
