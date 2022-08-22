@@ -527,8 +527,8 @@ Length|ESP packet ->
           subsequent messages that cannot be parsed as valid IKE messages or
           ESP messages with known SPIs, or if the authentication check for an
           IKE message or ESP message with a known SPI fails.  Implementations SHOULD NOT
-          tear down a connection if only a few consecutive ESP packets has an unknown
-          SPI, since the SPI databases may be momentarily out of sync.  If
+          tear down a connection if only a few consecutive ESP packets have unknown
+          SPIs, since the SPI databases may be momentarily out of sync.  If
           there is instead a syntax issue within an IKE message, an
           implementation MUST send the INVALID_SYNTAX notify payload and
           tear down the IKE SA as usual, rather than tearing down the TCP
