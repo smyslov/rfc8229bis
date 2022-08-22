@@ -409,7 +409,7 @@ Length|ESP packet ->
 
       <section title="Applicability" anchor="applicability">
         <t>TCP encapsulation is applicable only when it has been configured to
-        be used with specific IKE peers.  If a Responder is configured to accept and allowed to use
+        be used with specific IKE peers.  If a Responder is configured to accept and is allowed to use
         TCP encapsulation, it MUST listen on the configured port(s) in case
         any peers will initiate new IKE sessions.  Initiators MAY use TCP
         encapsulation for any IKE session to a peer that is configured to
