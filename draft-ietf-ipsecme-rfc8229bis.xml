@@ -409,7 +409,7 @@ Length|ESP packet ->
 
       <section title="Applicability" anchor="applicability">
         <t>TCP encapsulation is applicable only when it has been configured to
-        be used with specific IKE peers.  If a Responder is configured to accept and use
+        be used with specific IKE peers.  If a Responder is configured to accept and allowed to use
         TCP encapsulation, it MUST listen on the configured port(s) in case
         any peers will initiate new IKE sessions.  Initiators MAY use TCP
         encapsulation for any IKE session to a peer that is configured to
@@ -510,10 +510,10 @@ Length|ESP packet ->
           temporarily be two IKE SAs on the same TCP connection.
           </t>
 		
-          <t>If a TCP connection is being used to continue a previous IKE session,
+          <t>If a TCP connection is being used to continue an existing IKE/ESP session,
           the TCP Responder can recognize the session using either the IKE SPI
           from an encapsulated IKE message or the ESP SPI from an encapsulated
-          ESP message.  If the session had been fully established previously,
+          ESP packet.  If the session had been fully established previously,
           it is suggested that the TCP Originator send an UPDATE_SA_ADDRESSES
           message if MOBIKE is supported, or an empty informational message otherwise.
           </t>
@@ -527,7 +527,7 @@ Length|ESP packet ->
           subsequent messages that cannot be parsed as valid IKE messages or
           ESP messages with known SPIs, or if the authentication check for an
           IKE message or ESP message with a known SPI fails.  Implementations SHOULD NOT
-          tear down a connection if only a single ESP message has an unknown
+          tear down a connection if only a few consecutive ESP packets has an unknown
           SPI, since the SPI databases may be momentarily out of sync.  If
           there is instead a syntax issue within an IKE message, an
           implementation MUST send the INVALID_SYNTAX notify payload and
@@ -743,7 +743,7 @@ Length|ESP packet ->
           <t>Note that, depending on the configuration of TCP and TLS on the
           connection, TCP keep-alives <xref target="RFC1122"/> and TLS keep-alives <xref target="RFC6520"/>
           MAY be used.  These MUST NOT be used as indications of IKE peer
-          liveness, for which purpose the standard IKEv2 mechanism of exchanging empty INFORMATIONAL messages is used
+          liveness, for which purpose the standard IKEv2 mechanism of exchanging (usually empty) INFORMATIONAL messages is used
           (see Section 1.4 of <xref target="RFC7296" />).
           </t>
         </section>
